@@ -1,0 +1,667 @@
+﻿// ============================================================
+// BUYDIMA - JavaScript principal
+// TP N.º 3 - Desarrollo Front-End
+// Todas las interacciones son visuales / de demostración:
+// no hay pagos, registros ni envíos reales.
+// ============================================================
+
+'use strict';
+
+// ---------- Utilidades ----------
+
+/** Formatea un número como precio en pesos argentinos (ej: $ 1.647,96) */
+function formatearPrecio(valor) {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+  }).format(valor);
+}
+
+/** Muestra un aviso temporal (toast de Bootstrap) en la pantalla */
+function mostrarAviso(mensaje) {
+  let contenedor = document.getElementById('contenedor-avisos');
+  if (!contenedor) {
+    contenedor = document.createElement('div');
+    contenedor.id = 'contenedor-avisos';
+    contenedor.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    document.body.appendChild(contenedor);
+  }
+  const aviso = document.createElement('div');
+  aviso.className = 'toast align-items-center border-0';
+  aviso.setAttribute('role', 'alert');
+  aviso.setAttribute('aria-live', 'assertive');
+  aviso.setAttribute('aria-atomic', 'true');
+  aviso.innerHTML =
+    '<div class="d-flex"><div class="toast-body">' +
+    mensaje +
+    '</div><button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar aviso"></button></div>';
+  contenedor.appendChild(aviso);
+  const toast = new bootstrap.Toast(aviso, { delay: 3000 });
+  toast.show();
+  aviso.addEventListener('hidden.bs.toast', () => aviso.remove());
+}
+
+// ---------- Carrito de compras (demostración) ----------
+
+const CLAVE_CARRITO = 'buydima-carrito';
+
+/** Lee el carrito guardado en el navegador (localStorage) */
+function leerCarrito() {
+  try {
+    const datos = localStorage.getItem(CLAVE_CARRITO);
+    if (datos) {
+      return JSON.parse(datos);
+    }
+  } catch (error) {
+    // Si los datos están corruptos, se empieza con un carrito vacío
+    console.error('No se pudo leer el carrito:', error);
+  }
+  // Carrito inicial de demostración, igual al mockup
+  return [
+    {
+      juego: 'Free Fire',
+      producto: '560 diamantes',
+      precio: 1647.96,
+      cantidad: 1,
+      imagen: 'freefire.svg',
+    },
+    {
+      juego: 'Roblox',
+      producto: '1700 Robux',
+      precio: 1922.96,
+      cantidad: 1,
+      imagen: 'roblox-banner.jpg',
+    },
+  ];
+}
+
+/** Guarda el carrito y actualiza el contador del encabezado */
+function guardarCarrito(items) {
+  localStorage.setItem(CLAVE_CARRITO, JSON.stringify(items));
+  actualizarContadorCarrito();
+}
+
+/** Actualiza el número que aparece sobre el icono del carrito */
+function actualizarContadorCarrito() {
+  const contador = document.getElementById('contador-carrito');
+  if (!contador) return;
+  const total = leerCarrito().reduce((suma, item) => suma + item.cantidad, 0);
+  contador.textContent = total;
+  contador.hidden = total === 0;
+  /* Accesibilidad: el nombre accesible del enlace debe incluir el número
+     visible del contador para que coincidan (regla label-content-name-mismatch) */
+  const enlaceCarrito = contador.closest('a');
+  if (enlaceCarrito) {
+    enlaceCarrito.setAttribute(
+      'aria-label',
+      total > 0 ? 'Ver carrito de compras (' + total + ')' : 'Ver carrito de compras'
+    );
+  }
+}
+
+/** Agrega un producto al carrito (usado en detalle-juego) */
+function agregarAlCarrito(item) {
+  const carrito = leerCarrito();
+  carrito.push(item);
+  guardarCarrito(carrito);
+  mostrarAviso('<strong>' + item.producto + '</strong> se agregó al carrito.');
+}
+
+// ---------- Buscador del encabezado ----------
+
+/** Valida el buscador: necesita al menos 2 caracteres para buscar */
+function configurarBuscador() {
+  const formularios = document.querySelectorAll('form[role="search"]');
+  formularios.forEach((form) => {
+    form.addEventListener('submit', (evento) => {
+      const campo = form.querySelector('input[type="search"]');
+      const texto = campo.value.trim();
+      if (texto.length < 2) {
+        evento.preventDefault();
+        campo.classList.add('is-invalid');
+        campo.setAttribute('aria-invalid', 'true');
+        campo.focus();
+      } else {
+        campo.classList.remove('is-invalid');
+        // La página destino es distinta según dónde esté el archivo
+        const destino = window.location.pathname.includes('/paginas/')
+          ? 'juegos.html'
+          : 'paginas/juegos.html';
+        form.setAttribute('action', destino);
+        form.setAttribute('method', 'get');
+      }
+    });
+  });
+}
+
+// ---------- Volver atrás (botón de las páginas internas) ----------
+
+/** Botón "Volver": regresa a la página anterior del sitio;
+ *  si se entró directo (sin página previa), lleva al Inicio. */
+function configurarBotonVolver() {
+  document.querySelectorAll('[data-volver-atras]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      const vieneDelSitio =
+        document.referrer && document.referrer.startsWith(window.location.origin);
+      if (vieneDelSitio) {
+        history.back();
+      } else {
+        window.location.href = '../index.html';
+      }
+    });
+  });
+}
+
+// ---------- Favoritos (guardados en el navegador) ----------
+
+const CLAVE_FAVORITOS = 'buydima-favoritos';
+
+/** Catálogo de juegos que pueden marcarse como favoritos */
+const CATALOGO_FAVORITOS = {
+  freefire: { nombre: 'Free Fire', categoria: 'Battle Royale', imagen: 'freefire.svg' },
+  mobilelegends: { nombre: 'Mobile Legends', categoria: 'MOBA · RPG', imagen: 'mobilelegends.jpg' },
+  roblox: { nombre: 'Roblox', categoria: 'Sandbox · Aventura', imagen: 'roblox-banner.jpg' },
+  genshin: { nombre: 'Genshin Impact', categoria: 'Aventura · RPG', imagen: 'genshin.png' },
+  battleground: { nombre: 'Battlegrounds', categoria: 'Battle Royale', imagen: 'battleground.jpg' },
+};
+
+/** Lee los favoritos guardados; si no hay datos, empieza con una lista de ejemplo */
+function leerFavoritos() {
+  try {
+    const datos = localStorage.getItem(CLAVE_FAVORITOS);
+    if (datos) {
+      return JSON.parse(datos).filter((clave) => clave in CATALOGO_FAVORITOS);
+    }
+  } catch (error) {
+    console.error('No se pudieron leer los favoritos:', error);
+  }
+  // Favoritos iniciales de demostración
+  return ['freefire', 'mobilelegends', 'genshin'];
+}
+
+/** Guarda la lista de favoritos en el navegador */
+function guardarFavoritos(lista) {
+  localStorage.setItem(CLAVE_FAVORITOS, JSON.stringify(lista));
+}
+
+/** Página de favoritos: dibuja la grilla, el estado vacío y la lista para agregar */
+function configurarFavoritos() {
+  const grilla = document.getElementById('grilla-favoritos');
+  if (!grilla) return;
+  const vacio = document.getElementById('estado-vacio-favoritos');
+  const seccionAgregar = document.getElementById('seccion-agregar-favoritos');
+  const listaAgregar = document.getElementById('lista-agregar-favoritos');
+
+  /** Dibuja una tarjeta de favorito con corazón, botones y descripción */
+  function tarjetaFavorito(clave) {
+    const juego = CATALOGO_FAVORITOS[clave];
+    const articulo = document.createElement('article');
+    articulo.className = 'col';
+    articulo.innerHTML =
+      '<div class="tarjeta-juego tarjeta-favorito">' +
+      '<img src="../img/' +
+      juego.imagen +
+      '" alt="Logo del juego ' +
+      juego.nombre +
+      '">' +
+      '<button type="button" class="boton-corazon activo" data-quitar="' +
+      clave +
+      '" aria-pressed="true" aria-label="Quitar ' +
+      juego.nombre +
+      ' de favoritos">' +
+      '<i class="bi bi-heart-fill" aria-hidden="true"></i>' +
+      '</button>' +
+      '<div class="cuerpo">' +
+      '<h3>' +
+      juego.nombre +
+      '</h3>' +
+      '<p class="texto-suave small mb-2">' +
+      juego.categoria +
+      '</p>' +
+      '<div class="acciones-favorito">' +
+      '<a class="boton-compra boton-chico" href="detalle-juego.html?juego=' +
+      clave +
+      '">Ver productos</a>' +
+      '<button type="button" class="boton-quitar" data-quitar="' +
+      clave +
+      '" aria-label="Quitar de favoritos: ' +
+      juego.nombre +
+      '">Quitar de favoritos</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+    return articulo;
+  }
+
+  /** Dibuja una tarjeta pequeña para agregar un juego que no está en favoritos */
+  function tarjetaParaAgregar(clave) {
+    const juego = CATALOGO_FAVORITOS[clave];
+    const articulo = document.createElement('article');
+    articulo.className = 'col';
+    articulo.innerHTML =
+      '<div class="tarjeta-juego tarjeta-agregar">' +
+      '<img src="../img/' +
+      juego.imagen +
+      '" alt="Logo del juego ' +
+      juego.nombre +
+      '">' +
+      '<button type="button" class="boton-corazon" data-agregar="' +
+      clave +
+      '" aria-pressed="false" aria-label="Agregar ' +
+      juego.nombre +
+      ' a favoritos">' +
+      '<i class="bi bi-heart" aria-hidden="true"></i>' +
+      '</button>' +
+      '<div class="cuerpo">' +
+      '<h3>' +
+      juego.nombre +
+      '</h3>' +
+      '<p class="texto-suave small mb-0">' +
+      juego.categoria +
+      '</p>' +
+      '</div>' +
+      '</div>';
+    return articulo;
+  }
+
+  /** Vuelve a dibujar la pantalla completa según el estado actual */
+  function dibujar() {
+    const favoritos = leerFavoritos();
+
+    grilla.innerHTML = '';
+    favoritos.forEach((clave) => grilla.appendChild(tarjetaFavorito(clave)));
+    vacio.hidden = favoritos.length > 0;
+    grilla.hidden = favoritos.length === 0;
+
+    // Juegos del catálogo que todavía no son favoritos
+    const disponibles = Object.keys(CATALOGO_FAVORITOS).filter(
+      (clave) => !favoritos.includes(clave)
+    );
+    listaAgregar.innerHTML = '';
+    disponibles.forEach((clave) => listaAgregar.appendChild(tarjetaParaAgregar(clave)));
+    seccionAgregar.hidden = disponibles.length === 0;
+  }
+
+  // Un solo escuchador maneja los corazones y botones de ambas secciones
+  document.getElementById('contenido-principal').addEventListener('click', (evento) => {
+    const boton = evento.target.closest('[data-agregar], [data-quitar]');
+    if (!boton) return;
+    const clave = boton.dataset.agregar || boton.dataset.quitar;
+    const nombre = CATALOGO_FAVORITOS[clave].nombre;
+    let favoritos = leerFavoritos();
+
+    if (boton.dataset.agregar) {
+      favoritos.push(clave);
+      guardarFavoritos(favoritos);
+      mostrarAviso('<strong>' + nombre + '</strong> se agregó a favoritos.');
+    } else {
+      favoritos = favoritos.filter((otra) => otra !== clave);
+      guardarFavoritos(favoritos);
+      mostrarAviso('<strong>' + nombre + '</strong> se quitó de favoritos.');
+    }
+    dibujar();
+  });
+
+  dibujar();
+}
+
+// ============================================================
+// Inicialización por página
+// Cada página tiene <body data-pagina="..."> y acá se configura
+// el comportamiento correspondiente.
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  configurarBuscador();
+  configurarBotonVolver();
+  actualizarContadorCarrito();
+
+  const pagina = document.body.dataset.pagina;
+  switch (pagina) {
+    case 'inicio':
+      configurarInicio();
+      break;
+    case 'juegos':
+      configurarJuegos();
+      break;
+    case 'ofertas':
+      configurarOfertas();
+      break;
+    case 'carrito':
+      configurarCarrito();
+      break;
+    case 'contacto':
+      configurarContacto();
+      break;
+    case 'perfil':
+      configurarPerfil();
+      break;
+    case 'detalle-juego':
+      configurarDetalleJuego();
+      break;
+    case 'historial':
+      configurarHistorial();
+      break;
+    case 'favoritos':
+      configurarFavoritos();
+      break;
+  }
+});
+
+// ---------- Inicio ----------
+
+function configurarInicio() {
+  // El botón "Comprar ahora" lleva al catálogo; no necesita JS extra.
+  // Las tarjetas de juegos destacados ya son enlaces.
+}
+
+// ---------- Catálogo de juegos ----------
+
+function configurarJuegos() {
+  const chips = document.querySelectorAll('.chip-filtro');
+  const tarjetas = document.querySelectorAll('[data-categoria]');
+  const campoBusqueda = document.getElementById('filtro-busqueda');
+
+  function filtrar() {
+    const categoria = document.querySelector('.chip-filtro.activo')?.dataset.filtro || 'todos';
+    const texto = campoBusqueda ? campoBusqueda.value.trim().toLowerCase() : '';
+    tarjetas.forEach((tarjeta) => {
+      const coincideCategoria = categoria === 'todos' || tarjeta.dataset.categoria === categoria;
+      const nombre = tarjeta.dataset.nombre.toLowerCase();
+      const coincideTexto = nombre.includes(texto);
+      const columna = tarjeta.closest('.col, [class*="col-"]');
+      if (columna) {
+        columna.hidden = !(coincideCategoria && coincideTexto);
+      } else {
+        tarjeta.hidden = !(coincideCategoria && coincideTexto);
+      }
+    });
+  }
+
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((otro) => otro.classList.remove('activo'));
+      chip.classList.add('activo');
+      filtrar();
+    });
+  });
+
+  if (campoBusqueda) {
+    campoBusqueda.addEventListener('input', filtrar);
+  }
+
+  // Si se llega con #accion, #rpg, etc., se activa ese filtro
+  const hash = window.location.hash.replace('#', '');
+  const chipHash = document.querySelector('.chip-filtro[data-filtro="' + hash + '"]');
+  if (chipHash) {
+    chipHash.click();
+    chipHash.focus();
+  }
+
+  // Botón "Más populares": ordena las tarjetas por popularidad
+  const botonPopulares = document.getElementById('boton-populares');
+  if (botonPopulares) {
+    botonPopulares.addEventListener('click', () => {
+      const grilla = document.getElementById('grilla-juegos');
+      if (!grilla) return;
+      const columnas = Array.from(grilla.children);
+      columnas.sort((a, b) => {
+        const pa = Number(a.querySelector('[data-popularidad]')?.dataset.popularidad || 0);
+        const pb = Number(b.querySelector('[data-popularidad]')?.dataset.popularidad || 0);
+        return pb - pa;
+      });
+      columnas.forEach((col) => grilla.appendChild(col));
+      mostrarAviso('Catálogo ordenado por <strong>más populares</strong>.');
+    });
+  }
+
+  // Si viene una búsqueda desde el encabezado (?q=), se aplica
+  const parametros = new URLSearchParams(window.location.search);
+  const busqueda = parametros.get('q');
+  if (busqueda && campoBusqueda) {
+    campoBusqueda.value = busqueda;
+    filtrar();
+  }
+}
+
+// ---------- Ofertas especiales ----------
+
+function configurarOfertas() {
+  // Cuenta regresiva de demostración: 2 días, 14 horas y 37 minutos
+  const final = new Date();
+  final.setDate(final.getDate() + 2);
+  final.setHours(final.getHours() + 14);
+  final.setMinutes(final.getMinutes() + 37);
+
+  const dias = document.getElementById('cuenta-dias');
+  const horas = document.getElementById('cuenta-horas');
+  const minutos = document.getElementById('cuenta-minutos');
+  if (!dias || !horas || !minutos) return;
+
+  function actualizar() {
+    const restante = Math.max(0, final.getTime() - Date.now());
+    dias.textContent = String(Math.floor(restante / 86400000)).padStart(2, '0');
+    horas.textContent = String(Math.floor((restante / 3600000) % 24)).padStart(2, '0');
+    minutos.textContent = String(Math.floor((restante / 60000) % 60)).padStart(2, '0');
+  }
+  actualizar();
+  setInterval(actualizar, 1000);
+}
+
+// ---------- Carrito ----------
+
+function configurarCarrito() {
+  const lista = document.getElementById('lista-carrito');
+  if (!lista) return;
+
+  const RESUMEN = {
+    subtotal: document.getElementById('resumen-subtotal'),
+    descuento: document.getElementById('resumen-descuento'),
+    total: document.getElementById('resumen-total'),
+    filas: document.getElementById('filas-resumen'),
+  };
+  let codigoUsado = false;
+
+  function dibujar() {
+    const carrito = leerCarrito();
+    lista.innerHTML = '';
+    carrito.forEach((item, indice) => {
+      const rutaImg = window.location.pathname.includes('/paginas/') ? '../img/' : 'img/';
+      const fila = document.createElement('tr');
+      fila.innerHTML =
+        '<td><div class="d-flex align-items-center gap-2"><img src="' +
+        rutaImg +
+        item.imagen +
+        '" alt="Logo de ' +
+        item.juego +
+        '" width="64" height="48"><div><strong>' +
+        item.juego +
+        '</strong><br><small class="texto-suave">' +
+        item.producto +
+        '</small></div></div></td>' +
+        '<td><div class="control-cantidad">' +
+        '<button type="button" data-accion="menos" data-indice="' +
+        indice +
+        '" aria-label="Quitar una unidad de ' +
+        item.juego +
+        '">−</button>' +
+        '<span aria-live="polite">' +
+        item.cantidad +
+        '</span>' +
+        '<button type="button" data-accion="mas" data-indice="' +
+        indice +
+        '" aria-label="Agregar una unidad de ' +
+        item.juego +
+        '">+</button>' +
+        '</div></td>' +
+        '<td>' +
+        formatearPrecio(item.precio * item.cantidad) +
+        '</td>' +
+        '<td><button type="button" class="btn btn-link text-danger p-0" data-accion="eliminar" data-indice="' +
+        indice +
+        '" aria-label="Eliminar ' +
+        item.juego +
+        ' del carrito"><i class="bi bi-trash" aria-hidden="true"></i></button></td>';
+      lista.appendChild(fila);
+    });
+    calcularTotales(carrito);
+  }
+
+  function calcularTotales(carrito) {
+    const subtotal = carrito.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+    const descuento = codigoUsado ? subtotal * 0.1 : 0;
+    const total = subtotal - descuento;
+    RESUMEN.subtotal.textContent = formatearPrecio(subtotal);
+    RESUMEN.descuento.textContent = '− ' + formatearPrecio(descuento);
+    RESUMEN.total.textContent = formatearPrecio(total);
+    RESUMEN.filas.hidden = false;
+    document.getElementById('carrito-vacio').hidden = carrito.length > 0;
+  }
+
+  lista.addEventListener('click', (evento) => {
+    const boton = evento.target.closest('[data-accion]');
+    if (!boton) return;
+    const carrito = leerCarrito();
+    const indice = Number(boton.dataset.indice);
+    if (boton.dataset.accion === 'mas') carrito[indice].cantidad += 1;
+    if (boton.dataset.accion === 'menos')
+      carrito[indice].cantidad = Math.max(1, carrito[indice].cantidad - 1);
+    if (boton.dataset.accion === 'eliminar') {
+      carrito.splice(indice, 1);
+      mostrarAviso('Producto eliminado del carrito.');
+    }
+    guardarCarrito(carrito);
+    dibujar();
+  });
+
+  // Código de descuento de demostración: BUYDIMA10 (10% de descuento)
+  const formCodigo = document.getElementById('form-codigo');
+  formCodigo?.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    const campo = document.getElementById('codigo-descuento');
+    if (campo.value.trim().toUpperCase() === 'BUYDIMA10') {
+      codigoUsado = true;
+      campo.classList.remove('is-invalid');
+      mostrarAviso('Código <strong>BUYDIMA10</strong> aplicado: 10% de descuento.');
+      dibujar();
+    } else {
+      campo.classList.add('is-invalid');
+      campo.focus();
+    }
+  });
+
+  // El botón "Continuar compra" es solo visual (no hay pagos reales)
+  document.getElementById('boton-continuar')?.addEventListener('click', () => {
+    mostrarAviso('Esta es una demostración: no se realiza ningún pago real.');
+  });
+
+  dibujar();
+}
+
+// ---------- Contacto ----------
+
+function configurarContacto() {
+  const form = document.getElementById('form-contacto');
+  if (!form) return;
+  form.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    if (!form.checkValidity()) {
+      evento.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+    form.classList.remove('was-validated');
+    form.reset();
+    mostrarAviso('¡Consulta enviada! Te responderemos a la brevedad <em>(demostración)</em>.');
+  });
+}
+
+// ---------- Perfil ----------
+
+function configurarPerfil() {
+  const form = document.getElementById('form-perfil');
+  if (!form) return;
+  form.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    if (!form.checkValidity()) {
+      evento.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+    form.classList.remove('was-validated');
+    mostrarAviso(
+      'Cambios guardados <em>(demostración: los datos no se envían a un servidor)</em>.'
+    );
+  });
+}
+
+// ---------- Detalle de juego (vista nueva) ----------
+
+function configurarDetalleJuego() {
+  // Datos básicos de los juegos del catálogo para actualizar la vista
+  const JUEGOS = {
+    freefire: { nombre: 'Free Fire', imagen: 'freefire.svg', moneda: 'diamantes' },
+    mobilelegends: { nombre: 'Mobile Legends', imagen: 'mobilelegends.jpg', moneda: 'diamantes' },
+    roblox: { nombre: 'Roblox', imagen: 'roblox-banner.jpg', moneda: 'Robux' },
+    genshin: { nombre: 'Genshin Impact', imagen: 'genshin.png', moneda: 'Génesis' },
+    battleground: { nombre: 'Battlegrounds', imagen: 'battleground.jpg', moneda: 'UC' },
+  };
+
+  const parametros = new URLSearchParams(window.location.search);
+  const clave = parametros.get('juego') in JUEGOS ? parametros.get('juego') : 'mobilelegends';
+  const juego = JUEGOS[clave];
+
+  const titulo = document.getElementById('titulo-juego');
+  const imagen = document.getElementById('imagen-juego');
+  const campoId = document.getElementById('id-usuario');
+  if (titulo) titulo.textContent = juego.nombre;
+  if (imagen) {
+    imagen.src = '../img/' + juego.imagen;
+    imagen.alt = 'Logo del juego ' + juego.nombre;
+  }
+  // El ID de Free Fire es numérico; en otros juegos puede incluir letras
+  if (clave === 'freefire') {
+    campoId.pattern = '[0-9]{6,12}';
+  } else {
+    campoId.pattern = '[A-Za-z0-9.\\-]{5,20}';
+  }
+  document.querySelectorAll('.texto-moneda').forEach((el) => (el.textContent = juego.moneda));
+
+  // Agregar al carrito (validación de ID y paquete)
+  const form = document.getElementById('form-detalle');
+  form.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    const paquete = form.querySelector('input[name="paquete"]:checked');
+    if (!form.checkValidity() || !paquete) {
+      evento.stopPropagation();
+      form.classList.add('was-validated');
+      if (!paquete) {
+        document.getElementById('error-paquete').hidden = false;
+      }
+      return;
+    }
+    document.getElementById('error-paquete').hidden = true;
+    agregarAlCarrito({
+      juego: juego.nombre,
+      producto: paquete.value,
+      precio: Number(paquete.dataset.precio),
+      cantidad: 1,
+      imagen: juego.imagen,
+    });
+    form.reset();
+    form.classList.remove('was-validated');
+  });
+}
+
+// ---------- Historial de compras ----------
+
+function configurarHistorial() {
+  const filtro = document.getElementById('filtro-estado');
+  if (!filtro) return;
+  filtro.addEventListener('change', () => {
+    const valor = filtro.value;
+    document.querySelectorAll('#tabla-pedidos tbody tr').forEach((fila) => {
+      fila.hidden = valor !== 'todos' && fila.dataset.estado !== valor;
+    });
+  });
+}

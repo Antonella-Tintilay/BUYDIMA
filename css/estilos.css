@@ -1,0 +1,784 @@
+﻿/* ============================================================
+   BUYDIMA - Hoja de estilos principal
+   TP N.º 3 - Desarrollo Front-End
+   Paleta basada en los mockups de Figma (violetas oscuros)
+   ============================================================ */
+
+/* ---------- Variables de color y fuente ---------- */
+:root {
+  --fondo: #170c22;
+  --superficie: #241535;
+  --panel: #2e1a44;
+  --tarjeta: #311c49;
+  --borde: #4a2d6e;
+  --violeta: #a855f7;
+  --violeta-oscuro: #7c3aed;
+  --lila: #c084fc;
+  --texto: #f3eef9;
+  --texto-suave: #b7a6cc;
+}
+
+body {
+  background-color: var(--fondo);
+  color: var(--texto);
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+
+/* Enlace para saltar al contenido (accesibilidad con teclado) */
+.salto-contenido {
+  position: absolute;
+  left: -9999px;
+  z-index: 1100;
+}
+.salto-contenido:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+/* Foco siempre visible para navegación por teclado */
+:focus-visible {
+  outline: 2px solid var(--lila);
+  outline-offset: 2px;
+}
+
+/* ---------- Encabezado ---------- */
+.encabezado-sitio {
+  background-color: var(--superficie);
+  border-bottom: 1px solid var(--borde);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.logo-texto {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+.logo-texto .parte-buy {
+  color: var(--texto);
+}
+.logo-texto .parte-dima {
+  background: linear-gradient(90deg, var(--violeta), var(--lila));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Buscador del encabezado */
+.buscador {
+  position: relative;
+  max-width: 260px;
+  width: 100%;
+}
+.buscador .form-control {
+  background-color: var(--panel);
+  border-color: var(--borde);
+  color: var(--texto);
+  padding-right: 2.6rem;
+  border-radius: 0.6rem;
+}
+.buscador .form-control::placeholder {
+  color: var(--texto-suave);
+}
+.buscador .boton-buscar {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--texto-suave);
+  padding: 0.25rem 0.5rem;
+}
+
+.boton-icono {
+  color: var(--texto);
+  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.6rem;
+  text-decoration: none;
+}
+.boton-icono:hover {
+  background-color: var(--panel);
+  color: var(--texto);
+}
+
+.boton-menu {
+  background-color: var(--violeta);
+  color: #ffffff;
+  font-size: 1.4rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.6rem;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.boton-menu:hover {
+  background-color: var(--violeta-oscuro);
+  color: #ffffff;
+}
+
+.contador-carrito {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background-color: #d946ef;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 1.15rem;
+  line-height: 1.15rem;
+  text-align: center;
+  border-radius: 50%;
+}
+
+/* ---------- Menú hamburguesa (offcanvas) ---------- */
+.menu-lateral {
+  background: linear-gradient(170deg, #8b5cf6 0%, #6d28d9 60%, #4c1d95 100%);
+  width: 320px;
+  max-width: 85vw;
+  color: #ffffff;
+}
+.menu-lateral .btn-close {
+  filter: invert(1);
+}
+.menu-lateral .titulo-menu {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.menu-lateral .lista-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+/* Opción del menú: icono en columna fija + texto alineado a la izquierda */
+.menu-lateral .lista-menu a,
+.menu-lateral .submenu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-align: left;
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 0.55rem;
+  background-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+.menu-lateral .lista-menu a:hover,
+.menu-lateral .lista-menu a:focus-visible,
+.menu-lateral .submenu-toggle:hover,
+.menu-lateral .submenu-toggle:focus-visible {
+  background-color: rgba(255, 255, 255, 0.14);
+  transform: translateX(3px);
+}
+/* Columna fija para todos los iconos */
+.menu-lateral .icono-menu {
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
+  text-align: center;
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+/* El chevron se empuja siempre al extremo derecho */
+.menu-lateral .lista-menu a > .bi-chevron-right,
+.menu-lateral .submenu-toggle .bi-chevron-down {
+  margin-left: auto;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+}
+.menu-lateral .submenu-toggle[aria-expanded='true'] .bi-chevron-down {
+  transform: rotate(180deg);
+}
+.menu-lateral .lista-menu .activo {
+  background-color: rgba(255, 255, 255, 0.22);
+  font-weight: 600;
+}
+/* Subcategorías: indentadas y alineadas con el texto de su categoría */
+.menu-lateral .sublista-menu {
+  list-style: none;
+  margin: 0.15rem 0 0.35rem;
+  padding: 0 0 0 3.2rem;
+  display: grid;
+  gap: 0.15rem;
+}
+.menu-lateral .sublista-menu a {
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.45rem;
+  transition: background-color 0.15s ease;
+}
+.menu-lateral .sublista-menu a:hover,
+.menu-lateral .sublista-menu a:focus-visible {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+/* Botón de regreso en las páginas internas (debajo del navbar) */
+.boton-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background-color: var(--panel);
+  border: 1px solid var(--borde);
+  color: var(--texto);
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border-radius: 0.6rem;
+  margin-bottom: 1.25rem;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+.boton-volver:hover,
+.boton-volver:focus-visible {
+  background-color: var(--tarjeta);
+  border-color: var(--violeta);
+  color: #ffffff;
+}
+/* ---------- Bloques comunes ---------- */
+.etiqueta-catalogo {
+  color: var(--lila);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.titulo-pagina {
+  font-size: 2rem;
+  font-weight: 800;
+}
+.texto-suave {
+  color: var(--texto-suave);
+}
+
+.panel {
+  background-color: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 1rem;
+}
+
+/* ---------- Botones ---------- */
+.boton-compra {
+  /* Violeta oscuro: contraste 5.6:1 con texto blanco (aprobado WCAG AA) */
+  background-color: var(--violeta-oscuro);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.6rem 1.4rem;
+}
+.boton-compra:hover {
+  background-color: #6d28d9;
+  color: #ffffff;
+}
+.boton-compra:disabled {
+  background-color: var(--borde);
+}
+
+/* ---------- Filtros (chips) ---------- */
+.chip-filtro {
+  border: 1px solid var(--borde);
+  background-color: transparent;
+  color: var(--texto-suave);
+  border-radius: 50rem;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.92rem;
+}
+.chip-filtro:hover {
+  border-color: var(--violeta);
+  color: var(--texto);
+}
+.chip-filtro.activo {
+  /* Violeta oscuro: contraste 5.6:1 con texto blanco (aprobado WCAG AA) */
+  background-color: var(--violeta-oscuro);
+  border-color: var(--violeta-oscuro);
+  color: #ffffff;
+}
+
+/* ---------- Tarjetas de juego ---------- */
+.tarjeta-juego {
+  background-color: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  height: 100%;
+  transition: transform 0.15s ease;
+}
+.tarjeta-juego:hover {
+  transform: translateY(-3px);
+}
+.tarjeta-juego img {
+  width: 100%;
+  /* Todas las tarjetas tienen la misma proporción y la imagen la llena sin deformarse */
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  background-color: var(--panel);
+}
+.tarjeta-juego .cuerpo {
+  padding: 0.75rem 0.9rem 0.9rem;
+}
+.tarjeta-juego h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.enlace-recargar {
+  color: var(--lila);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.enlace-recargar:hover {
+  text-decoration: underline;
+  color: var(--lila);
+}
+.precio-oferta {
+  color: #ffffff;
+  font-weight: 700;
+}
+.precio-anterior {
+  color: var(--texto-suave);
+  text-decoration: line-through;
+  font-size: 0.85rem;
+}
+
+/* ---------- Carrusel de promociones del héroe ---------- */
+.carrusel-principal {
+  /* Evita que el carrusel colapse de altura en pantallas chicas */
+  min-height: 260px;
+}
+.carrusel-principal img {
+  /* Sin fondo propio: las bandas se funden con el gradiente del héroe */
+  background-color: transparent;
+}
+.carrusel-principal .carousel-indicators [data-bs-target] {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+.carrusel-principal .carousel-indicators .active {
+  background-color: var(--lila);
+}
+.carrusel-principal .carousel-control-prev,
+.carrusel-principal .carousel-control-next {
+  width: 3rem;
+  opacity: 0.85;
+}
+.carrusel-principal .carousel-control-prev:hover,
+.carrusel-principal .carousel-control-next:hover {
+  opacity: 1;
+}
+.carrusel-principal .carousel-control-prev-icon,
+.carrusel-principal .carousel-control-next-icon {
+  background-color: rgba(23, 12, 34, 0.65);
+  border-radius: 50%;
+  padding: 1.1rem;
+}
+
+/* ---------- Inicio: héroe ---------- */
+.heroe {
+  background: linear-gradient(120deg, #2b1543 0%, #1d0f2e 60%);
+  border: 1px solid var(--borde);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.heroe h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+}
+.heroe .resaltado {
+  color: var(--lila);
+}
+.insignias-confianza {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+.insignias-confianza i {
+  color: var(--lila);
+  margin-right: 0.35rem;
+}
+
+/* ---------- Ofertas ---------- */
+.banner-oferta {
+  background: linear-gradient(95deg, #5b21b6, #7c3aed);
+  border-radius: 1rem;
+  padding: 1.75rem;
+}
+.cuenta-caja {
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: 0.6rem;
+  min-width: 74px;
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+}
+.cuenta-caja strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: block;
+}
+.cuenta-caja small {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Métodos de pago ---------- */
+.tarjeta-metodo {
+  background-color: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 0.8rem;
+  padding: 1.25rem;
+  height: 100%;
+}
+.tarjeta-metodo i {
+  color: var(--lila);
+  font-size: 1.6rem;
+}
+.paso-numero {
+  color: var(--lila);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+/* ---------- Carrito ---------- */
+.tabla-carrito img {
+  width: 64px;
+  height: 48px;
+  object-fit: contain;
+  background-color: var(--panel);
+  border-radius: 0.5rem;
+}
+.control-cantidad {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--borde);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.control-cantidad button {
+  background-color: var(--panel);
+  color: var(--texto);
+  border: none;
+  width: 2rem;
+  height: 2rem;
+}
+.control-cantidad button:hover {
+  background-color: var(--violeta-oscuro);
+}
+.control-cantidad span {
+  min-width: 2.2rem;
+  text-align: center;
+  font-weight: 600;
+}
+.panel-resumen {
+  background: linear-gradient(160deg, #3b2069, #2a1741);
+  border: 1px solid var(--borde);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+.fila-resumen {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.3rem 0;
+}
+.fila-resumen .total {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+/* ---------- Perfil ---------- */
+.avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--violeta);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.lista-perfil {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lista-perfil a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--texto);
+  text-decoration: none;
+  padding: 0.7rem 1rem;
+  border-radius: 0.6rem;
+  font-weight: 500;
+}
+.lista-perfil a:hover,
+.lista-perfil a:focus-visible {
+  background-color: var(--panel);
+}
+.lista-perfil .peligro {
+  color: #fb7185;
+}
+
+/* ---------- Detalle de juego ---------- */
+/* Radio de paquete oculto visualmente pero accesible por teclado */
+.entrada-paquete {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.paquete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  height: 100%;
+  cursor: pointer;
+  background-color: var(--tarjeta);
+}
+.paquete:hover {
+  border-color: var(--violeta);
+}
+.paquete strong {
+  color: #ffffff;
+}
+.entrada-paquete:checked + .paquete {
+  border-color: var(--violeta);
+  background-color: rgba(168, 85, 247, 0.18);
+}
+.entrada-paquete:focus-visible + .paquete {
+  outline: 2px solid var(--lila);
+  outline-offset: 2px;
+}
+
+/* ---------- Formularios ---------- */
+.form-control,
+.form-select {
+  background-color: var(--panel);
+  border-color: var(--borde);
+  color: var(--texto);
+}
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--panel);
+  border-color: var(--violeta);
+  color: var(--texto);
+  box-shadow: 0 0 0 0.2rem rgba(168, 85, 247, 0.25);
+}
+.form-control::placeholder {
+  color: var(--texto-suave);
+}
+.form-label {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ---------- Historial ---------- */
+.tarjeta-dato {
+  background-color: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 0.8rem;
+  padding: 1rem 1.25rem;
+}
+.tarjeta-dato small {
+  color: var(--texto-suave);
+}
+.tarjeta-dato strong {
+  font-size: 1.4rem;
+}
+.etiqueta-estado {
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 50rem;
+  padding: 0.25rem 0.7rem;
+}
+.etiqueta-estado.completado {
+  background-color: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+.etiqueta-estado.proceso {
+  background-color: rgba(250, 204, 21, 0.15);
+  color: #facc15;
+}
+
+/* ---------- Pie de página ---------- */
+.pie-sitio {
+  background-color: var(--superficie);
+  border-top: 1px solid var(--borde);
+  margin-top: 4rem;
+  padding: 3rem 0 1.5rem;
+}
+.pie-sitio h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.9rem;
+}
+.pie-sitio ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pie-sitio a {
+  color: var(--texto-suave);
+  text-decoration: none;
+  display: inline-block;
+  padding: 0.2rem 0;
+}
+.pie-sitio a:hover {
+  color: var(--texto);
+}
+.firma-pie {
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 767px) {
+  .heroe h1 {
+    font-size: 1.9rem;
+  }
+  .titulo-pagina {
+    font-size: 1.5rem;
+  }
+  .buscador {
+    max-width: none;
+  }
+}
+
+/* ---------- Favoritos ---------- */
+.tarjeta-favorito {
+  position: relative;
+}
+
+/* Corazón sobre la imagen: relleno cuando ya es favorito, contorno si no */
+.boton-corazon {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(23, 12, 34, 0.78);
+  color: var(--texto-suave);
+  font-size: 1.15rem;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
+}
+.boton-corazon:hover,
+.boton-corazon:focus-visible {
+  transform: scale(1.12);
+  color: #ffffff;
+}
+.boton-corazon.activo {
+  color: var(--violeta);
+}
+
+/* Acciones dentro de la tarjeta de favorito */
+.tarjeta-favorito .acciones-favorito {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+.tarjeta-favorito .boton-compra.boton-chico {
+  padding: 0.45rem 1rem;
+  font-size: 0.88rem;
+}
+.boton-quitar {
+  background-color: transparent;
+  border: none;
+  color: var(--texto-suave);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.3rem 0.2rem;
+  border-radius: 0.4rem;
+  transition: color 0.15s ease;
+}
+.boton-quitar:hover,
+.boton-quitar:focus-visible {
+  color: #fb7185;
+}
+
+/* Tarjetas más chicas de la sección "agregar a favoritos" */
+.tarjeta-agregar .cuerpo {
+  padding: 0.6rem 0.9rem 0.75rem;
+}
+.tarjeta-agregar h3 {
+  font-size: 0.92rem;
+}
+
+/* Estado vacío: todavía no hay favoritos guardados */
+.estado-vacio-favoritos {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+.estado-vacio-favoritos .icono-vacio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background-color: var(--panel);
+  border: 1px solid var(--borde);
+  color: var(--lila);
+  font-size: 2.2rem;
+  margin-bottom: 1.25rem;
+}
+.estado-vacio-favoritos h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.estado-vacio-favoritos p {
+  max-width: 32rem;
+  margin-left: auto;
+  margin-right: auto;
+}

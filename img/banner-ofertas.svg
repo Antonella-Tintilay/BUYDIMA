@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Banner de ofertas especiales de BUYDIMA">
+  <defs>
+    <linearGradient id="ofertas" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#312e81"/>
+      <stop offset="0.6" stop-color="#6d28d9"/>
+      <stop offset="1" stop-color="#a21caf"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#ofertas)"/>
+  <circle cx="540" cy="70" r="100" fill="#e879f9" opacity="0.2"/>
+  <polygon points="70,290 90,306 70,338 50,306" fill="#d8b4fe" opacity="0.8"/>
+  <polygon points="580,280 600,295 580,325 560,295" fill="#c084fc" opacity="0.7"/>
+  <text x="320" y="120" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#e9d5ff" text-anchor="middle" letter-spacing="3">SEMANA DE OFERTAS</text>
+  <text x="320" y="195" font-family="Arial Black, Arial, sans-serif" font-size="62" font-weight="900" fill="#ffffff" text-anchor="middle">HASTA 25% OFF</text>
+  <text x="320" y="240" font-family="Arial, sans-serif" font-size="20" fill="#e9d5ff" text-anchor="middle">en recargas seleccionadas</text>
+  <rect x="258" y="262" width="124" height="34" rx="17" fill="#ffffff"/>
+  <text x="320" y="285" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#6d28d9" text-anchor="middle">Ver ofertas</text>
+</svg>
