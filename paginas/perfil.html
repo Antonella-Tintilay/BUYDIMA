@@ -170,18 +170,18 @@
               <img
                 class="avatar mb-2"
                 src="../img/avatar.svg"
-                alt="Avatar con las iniciales TA"
+                alt="Avatar del perfil con el logo diamante de BUYDIMA"
                 width="84"
                 height="84"
               />
-              <h2 class="h5 mb-1">Tintilay Antonella</h2>
-              <p class="small mb-3" style="color: #4ade80">
+              <h2 class="h5 mb-1">Mi perfil</h2>
+              <p class="small mb-3" style="color: #4ade80" id="estado-sesion">
                 <i class="bi bi-circle-fill" style="font-size: 0.5rem" aria-hidden="true"></i>
-                Conectada en este momento
+                Conectado/a
               </p>
               <nav aria-label="Opciones de la cuenta">
                 <ul class="lista-perfil text-start">
-                  <li>
+                  <li id="item-editar-perfil">
                     <a href="#form-perfil" aria-current="page"
                       ><i class="bi bi-pencil-square" aria-hidden="true"></i> Editar perfil
                       <i class="bi bi-chevron-right ms-auto" aria-hidden="true"></i
@@ -193,19 +193,70 @@
                       <i class="bi bi-chevron-right ms-auto" aria-hidden="true"></i
                     ></a>
                   </li>
-                  <li>
-                    <a href="#" class="peligro"
-                      ><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
+                  <li id="item-iniciar-sesion" hidden>
+                    <a href="#form-login"
+                      ><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Iniciar sesión
                       <i class="bi bi-chevron-right ms-auto" aria-hidden="true"></i
                     ></a>
+                  </li>
+                  <li id="item-cerrar-sesion" hidden>
+                    <button type="button" class="peligro" data-cerrar-sesion>
+                      <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
+                      <i class="bi bi-chevron-right ms-auto" aria-hidden="true"></i>
+                    </button>
                   </li>
                 </ul>
               </nav>
             </div>
           </aside>
 
+          <!-- Panel de inicio de sesión (simulación, se muestra sin sesión activa) -->
+          <section class="col-lg-8" id="seccion-login" hidden>
+            <h2 class="h4 mb-3">Iniciar sesión</h2>
+            <form id="form-login" class="panel p-4" novalidate>
+              <p class="texto-suave small mb-4">
+                Simulación para el proyecto: no hay cuentas ni contraseñas reales ni seguridad de
+                sesión. Los datos se guardan solo en este navegador.
+              </p>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label" for="campo-login-nombre">Nombre de jugador</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="campo-login-nombre"
+                    placeholder="Ej: Jugador BUYDIMA"
+                    required
+                    minlength="2"
+                    autocomplete="off"
+                  />
+                  <div class="invalid-feedback">Ingresá un nombre de al menos 2 caracteres.</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="campo-login-correo">Correo electrónico</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="campo-login-correo"
+                    placeholder="Ej: jugador@correo.com"
+                    required
+                    autocomplete="off"
+                  />
+                  <div class="invalid-feedback">Ingresá un correo electrónico válido.</div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <button class="btn boton-compra" type="submit">
+                  <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
+                </button>
+              </div>
+            </form>
+          </section>
+
           <!-- Formulario de edición de perfil -->
-          <section class="col-lg-8">
+          <section class="col-lg-8" id="seccion-perfil">
             <h2 class="h4 mb-3">Editar perfil</h2>
             <form id="form-perfil" class="panel p-4" novalidate>
               <p class="texto-suave small">Modificá tu información personal y de contacto.</p>
@@ -213,7 +264,7 @@
               <div class="d-flex align-items-center gap-3 mb-4">
                 <img
                   src="../img/avatar.svg"
-                  alt="Foto de perfil actual con las iniciales TA"
+                  alt="Foto de perfil actual con el logo diamante de BUYDIMA"
                   width="64"
                   height="64"
                   class="rounded-circle"
@@ -230,7 +281,6 @@
                     type="text"
                     class="form-control"
                     id="campo-nombre-perfil"
-                    value="Antonella"
                     required
                     autocomplete="given-name"
                   />
@@ -242,7 +292,6 @@
                     type="text"
                     class="form-control"
                     id="campo-apellido-perfil"
-                    value="Tintilay"
                     required
                     autocomplete="family-name"
                   />
@@ -254,7 +303,6 @@
                     type="email"
                     class="form-control"
                     id="campo-correo-perfil"
-                    value="antonellatyy@gmail.com"
                     required
                     autocomplete="email"
                   />

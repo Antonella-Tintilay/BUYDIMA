@@ -538,19 +538,27 @@ body {
   margin: 0;
   padding: 0;
 }
-.lista-perfil a {
+.lista-perfil a,
+.lista-perfil button {
   display: flex;
   align-items: center;
+  width: 100%;
   gap: 0.6rem;
   color: var(--texto);
   text-decoration: none;
   padding: 0.7rem 1rem;
   border-radius: 0.6rem;
   font-weight: 500;
+  background-color: transparent;
+  border: none;
+  text-align: left;
 }
 .lista-perfil a:hover,
-.lista-perfil a:focus-visible {
+.lista-perfil a:focus-visible,
+.lista-perfil button:hover,
+.lista-perfil button:focus-visible {
   background-color: var(--panel);
+  color: var(--texto);
 }
 .lista-perfil .peligro {
   color: #fb7185;

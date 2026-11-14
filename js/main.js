@@ -56,23 +56,8 @@ function leerCarrito() {
     // Si los datos están corruptos, se empieza con un carrito vacío
     console.error('No se pudo leer el carrito:', error);
   }
-  // Carrito inicial de demostración, igual al mockup
-  return [
-    {
-      juego: 'Free Fire',
-      producto: '560 diamantes',
-      precio: 1647.96,
-      cantidad: 1,
-      imagen: 'freefire.svg',
-    },
-    {
-      juego: 'Roblox',
-      producto: '1700 Robux',
-      precio: 1922.96,
-      cantidad: 1,
-      imagen: 'roblox-banner.jpg',
-    },
-  ];
+  // Un visitante nuevo empieza con el carrito vacío
+  return [];
 }
 
 /** Guarda el carrito y actualiza el contador del encabezado */
@@ -175,8 +160,8 @@ function leerFavoritos() {
   } catch (error) {
     console.error('No se pudieron leer los favoritos:', error);
   }
-  // Favoritos iniciales de demostración
-  return ['freefire', 'mobilelegends', 'genshin'];
+  // Un visitante nuevo empieza sin favoritos
+  return [];
 }
 
 /** Guarda la lista de favoritos en el navegador */
@@ -578,21 +563,115 @@ function configurarContacto() {
 
 // ---------- Perfil ----------
 
+// ---------- Perfil y sesión simulada ----------
+
+const CLAVE_SESION = 'buydima-sesion';
+
+/** Lee la sesión de prueba guardada en el navegador (o null si no la hay) */
+function leerSesion() {
+  try {
+    const datos = localStorage.getItem(CLAVE_SESION);
+    return datos ? JSON.parse(datos) : null;
+  } catch (error) {
+    console.error('No se pudo leer la sesión:', error);
+    return null;
+  }
+}
+
+/** Guarda el estado de sesión de prueba */
+function guardarSesion(sesion) {
+  localStorage.setItem(CLAVE_SESION, JSON.stringify(sesion));
+}
+
+/** Elimina el estado de sesión de prueba */
+function borrarSesion() {
+  localStorage.removeItem(CLAVE_SESION);
+}
+
 function configurarPerfil() {
-  const form = document.getElementById('form-perfil');
-  if (!form) return;
-  form.addEventListener('submit', (evento) => {
+  const seccionPerfil = document.getElementById('seccion-perfil');
+  if (!seccionPerfil) return;
+
+  const seccionLogin = document.getElementById('seccion-login');
+  const formPerfil = document.getElementById('form-perfil');
+  const formLogin = document.getElementById('form-login');
+  const estado = document.getElementById('estado-sesion');
+
+  /** Muestra el panel que corresponde según si hay sesión de prueba activa */
+  function actualizarVista() {
+    const sesion = leerSesion();
+    const conectado = Boolean(sesion);
+
+    seccionPerfil.hidden = !conectado;
+    seccionLogin.hidden = conectado;
+    document.getElementById('item-cerrar-sesion').hidden = !conectado;
+    document.getElementById('item-iniciar-sesion').hidden = conectado;
+    document.getElementById('item-editar-perfil').hidden = !conectado;
+
+    if (conectado) {
+      estado.style.color = '#4ade80';
+      estado.innerHTML =
+        '<i class="bi bi-circle-fill" style="font-size: 0.5rem" aria-hidden="true"></i> Conectado/a como ' +
+        sesion.nombre;
+      // El perfil se precarga con los datos de la sesión de prueba (razón funcional)
+      document.getElementById('campo-nombre-perfil').value = sesion.nombre;
+      document.getElementById('campo-correo-perfil').value = sesion.correo;
+    } else {
+      estado.style.color = 'var(--texto-suave)';
+      estado.innerHTML =
+        '<i class="bi bi-circle" style="font-size: 0.5rem" aria-hidden="true"></i> Sesión no iniciada';
+    }
+  }
+
+  // Iniciar sesión (simulación): valida el formulario y guarda el estado de prueba
+  formLogin.addEventListener('submit', (evento) => {
     evento.preventDefault();
-    if (!form.checkValidity()) {
+    if (!formLogin.checkValidity()) {
       evento.stopPropagation();
-      form.classList.add('was-validated');
+      formLogin.classList.add('was-validated');
       return;
     }
-    form.classList.remove('was-validated');
+    formLogin.classList.remove('was-validated');
+    guardarSesion({
+      nombre: document.getElementById('campo-login-nombre').value.trim(),
+      correo: document.getElementById('campo-login-correo').value.trim(),
+    });
+    mostrarAviso('Sesión iniciada <em>(simulación: no hay cuentas ni seguridad reales)</em>.');
+    actualizarVista();
+  });
+
+  // Cerrar sesión: borra el estado de prueba y vuelve al inicio
+  document.querySelector('[data-cerrar-sesion]').addEventListener('click', () => {
+    borrarSesion();
+    mostrarAviso('Sesión cerrada.');
+    actualizarVista();
+    setTimeout(() => {
+      window.location.href = '../index.html';
+    }, 900);
+  });
+
+  // Guardar cambios del perfil: valida y mantiene sincronizada la sesión de prueba
+  formPerfil.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    if (!formPerfil.checkValidity()) {
+      evento.stopPropagation();
+      formPerfil.classList.add('was-validated');
+      return;
+    }
+    formPerfil.classList.remove('was-validated');
+    const sesion = leerSesion();
+    if (sesion) {
+      sesion.nombre = document.getElementById('campo-nombre-perfil').value.trim();
+      sesion.correo = document.getElementById('campo-correo-perfil').value.trim();
+      guardarSesion(sesion);
+    }
     mostrarAviso(
       'Cambios guardados <em>(demostración: los datos no se envían a un servidor)</em>.'
     );
+    actualizarVista();
   });
+
+  actualizarVista();
 }
 
 // ---------- Detalle de juego (vista nueva) ----------
