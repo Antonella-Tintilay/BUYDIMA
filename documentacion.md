@@ -216,6 +216,7 @@ La auditoría se ejecutó con Lighthouse (motor axe-core) sobre las **9 páginas
 | Riesgo de desbordamiento horizontal en la grilla del héroe y tarjetas       | Uso de `row-cols-*` de Bootstrap, `img-fluid`, `object-fit: cover` y `overflow` controlado en las tarjetas                               |
 | El buscador del encabezado debía funcionar desde cualquier carpeta          | `main.js` detecta si la página está en `/paginas/` y ajusta el `action` y las rutas de imágenes                                          |
 | `alert()` de JavaScript no es accesible ni estético                         | Se reemplazó por **toasts de Bootstrap** con `role="alert"`                                                                              |
+| El botón "Cerrar sesión" no hacía nada y no existía inicio de sesión        | **Sesión simulada** en `perfil.html`: clave `buydima-sesion` en `localStorage`; iniciar/cerrar sesión funcionan e informan que no hay seguridad real |
 | El carrito debía persistir entre páginas                                    | Se usa `localStorage` con la clave `buydima-carrito`; si está vacío se muestra el estado del mockup                                      |
 | Riesgo de contraste insuficiente en textos secundarios                      | Se usó lila claro `#c084fc` para textos pequeños sobre fondo oscuro en lugar de violeta medio                                            |
 
