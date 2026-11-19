@@ -1,0 +1,6 @@
+# Prettier no soporta PHP sin un plugin (dependencia innecesaria para este TP)
+*.php
+
+# Configuración de entorno
+.env
+.env.example
