@@ -1,22 +1,19 @@
 # BUYDIMA — Tienda de recargas de juegos y monedas virtuales
 
-Proyecto de desarrollo de una tienda online de diamantes y monedas virtuales
-(Free Fire, Mobile Legends, Roblox, Genshin Impact, Battlegrounds), realizado como
-**TP N.º 4 de Programación Web**.
+Tienda online de diamantes y monedas virtuales (Free Fire, Mobile Legends, Roblox,
+Genshin Impact, Battlegrounds). Es el **TP N.º 4 de Programación Web**.
 
-El sitio nació en el TP N.º 3 como maquetación estática (HTML5 + Bootstrap 5) y en este
-TP migró a **PHP**: las páginas se renderizan del lado del servidor (SSR), los elementos
-comunes se reutilizan con **includes (SSI)** y la configuración se maneja con
-**variables de entorno**.
+El sitio se maquetó en el TP N.º 3 con HTML5 y Bootstrap 5, y en este TP se migró a
+**PHP**: las páginas se renderizan en el servidor (SSR), los elementos comunes se
+reutilizan con **includes (SSI)** y la configuración se lee de **variables de entorno**.
 
 ## Diseños en Figma
 
 [Ver proyecto BUYDIMA en Figma](https://www.figma.com/design/FG1K8az0lhOJ4UW6jQHqwA/BUYDIMA?node-id=0-1&t=SuZde1xKh9fQQfyJ-1)
 
-En la carpeta `mockups/` se encuentran las imágenes de las pantallas diseñadas.
-Las vistas **detalle de juego** (ID de usuario + selección de paquetes de diamantes y pases) y
-**mis favoritos** (juegos guardados en el navegador) se agregaron sobre el diseño
-de Figma; queda pendiente incorporarlas al diseño.
+En `mockups/` están las imágenes de las pantallas diseñadas. Las vistas **detalle de
+juego** (ID de usuario y paquetes) y **mis favoritos** no están en Figma: se hicieron
+directamente en el sitio y quedan pendientes de agregar al diseño.
 
 ## Tecnologías
 
@@ -80,7 +77,7 @@ BUYDIMA/
 
 ## Modularización con includes (SSI)
 
-Los elementos que se repiten en todas las páginas viven en `includes/` y se insertan
+Los elementos que se repiten en todas las páginas están en `includes/` y se insertan
 con `require_once __DIR__ . '/../includes/...'` en cada página:
 
 - `header.php`: `<head>` con **título dinámico** (`$titulo_pagina`), meta descripción,
@@ -141,7 +138,7 @@ servidor, sin JavaScript.
 
 ## Variables de entorno
 
-La configuración vive en `.env` (local, ignorado por Git) y se carga con
+La configuración está en `.env` (local, ignorado por Git) y se carga con
 `config/env.php` (PHP nativo, sin Composer):
 
 ```env
@@ -177,8 +174,7 @@ APP_ENV=local
 
 ## Documentación
 
-La explicación técnica completa (tecnologías, estructura, SEO, accesibilidad, Prettier,
-Lighthouse, includes y variables de entorno) está en [`documentacion.md`](documentacion.md).
+La explicación técnica está en [`documentacion.md`](documentacion.md).
 
 ---
 

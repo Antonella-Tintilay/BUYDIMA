@@ -1,8 +1,8 @@
 # Documentación técnica — BUYDIMA
 
 TP N.º 3 — Desarrollo Front-End y **TP N.º 4 — Programación Web (migración a PHP con SSI,
-SSR y variables de entorno)**. Este documento explica cómo está construido el sitio,
-qué criterios se aplicaron y qué problemas se detectaron durante el desarrollo.
+SSR y variables de entorno)**. Reúne las decisiones técnicas y los problemas corregidos en
+ambos trabajos.
 
 ---
 
@@ -78,10 +78,9 @@ BUYDIMA/
 | **Nueva vista** | **Detalle de juego / recarga**                               | `paginas/detalle-juego.php`     |
 | **Nueva vista** | **Mis favoritos**                                            | `paginas/favoritos.php`         |
 
-> **Nota:** las vistas de _detalle de juego_ y _mis favoritos_ no estaban en el diseño
-> de Figma original. Se crearon para completar las 10 vistas y para que los botones
-> "Recargar >" de las tarjetas y el ítem "Mis favoritos" del menú tuvieran destino real.
-> **Pendiente:** agregar estas pantallas al proyecto de Figma.
+> **Nota:** _detalle de juego_ y _mis favoritos_ no estaban en Figma. Se agregaron para
+> llegar a las 10 vistas y para que los botones "Recargar >" y el ítem "Mis favoritos"
+> del menú tuvieran destino. **Pendiente:** agregarlas al proyecto de Figma.
 
 ---
 
@@ -178,7 +177,7 @@ npx prettier --write .
 
 ## 8. Auditoría con Google Lighthouse
 
-**Instrucciones para ejecutarla** (Chrome o Edge):
+**Cómo ejecutarla** (Chrome o Edge):
 
 1. Abrir el sitio desde el servidor local (`http://localhost/BUYDIMA/` con XAMPP o Laragon).
 2. Abrir DevTools (F12) → pestaña **Lighthouse**.
@@ -186,9 +185,11 @@ npx prettier --write .
 4. Seleccionar **Mobile** y hacer clic en _Analyze page load_.
 5. Repetir en **Desktop** y en las páginas principales (inicio, catálogo, carrito, detalle de juego).
 
-**Resultados reales (auditoría ejecutada el 14/11/2026 sobre servidor local `http://localhost:8377`):**
+**Resultados (14/11/2026, servidor local `http://localhost:8377`):**
 
-La auditoría se ejecutó con Lighthouse (motor axe-core) sobre las **9 páginas del sitio**. Los valores de _Performance_ quedan pendientes porque la herramienta utilizada no emula dispositivos ni mide rendimiento; se completarán con la auditoría de Chrome DevTools.
+Se auditó el sitio con Lighthouse (motor axe-core). _Performance_ queda pendiente porque
+la herramienta usada no emula dispositivos ni mide rendimiento; se completará con Chrome
+DevTools.
 
 | Página               | Performance | Accesibilidad | Best Practices | SEO     |
 | -------------------- | ----------- | ------------- | -------------- | ------- |
@@ -211,7 +212,7 @@ La auditoría se ejecutó con Lighthouse (motor axe-core) sobre las **9 páginas
 | `color-contrast`: mismo problema en el chip de filtro activo `.chip-filtro.activo`                                                    | Fondo cambiado a `--violeta-oscuro` `#7c3aed` (5,6:1)                                                                                 |
 | `label-content-name-mismatch`: el enlace del carrito tenía `aria-label="Ver carrito de compras"` pero mostraba el número de productos | `main.js` actualiza el nombre accesible junto con el contador: `Ver carrito de compras (3)` — visible y accesible coinciden           |
 
-**Posibles advertencias esperables y su justificación:**
+**Advertencias esperables:**
 
 - Imágenes SVG placeholder: se reemplazarán por las exportadas de Figma.
 - CDN de Google Fonts puede sugerir `font-display` (ya configurado con `display=swap`).
@@ -245,7 +246,7 @@ La auditoría se ejecutó con Lighthouse (motor axe-core) sobre las **9 páginas
 
 ### 10.1 Modularización con includes (SSI)
 
-Los elementos comunes del sitio viven en `includes/` y se insertan en las 10 páginas:
+Los elementos comunes del sitio están en `includes/` y se insertan en las 10 páginas:
 
 ```php
 require_once __DIR__ . '/../includes/header.php';
@@ -268,7 +269,7 @@ Las páginas de la raíz y de `paginas/` tienen niveles de profundidad distintos
 
 - **Rutas del servidor (includes):** `require_once __DIR__ . '/config/env.php'`
   en la raíz y `require_once __DIR__ . '/../config/env.php'` en `paginas/`.
-  `__DIR__` apunta siempre a la carpeta del archivo, sin ambigüedad.
+  `__DIR__` apunta siempre a la carpeta del archivo.
 - **Rutas públicas (CSS, JS, imágenes, enlaces):** cada página define
   `$ruta_base = '.'` (raíz) o `$ruta_base = '..'` (subcarpeta), y los includes
   generan rutas como `<?php echo $ruta_base ?>/css/estilos.css`.
@@ -308,7 +309,7 @@ require_once __DIR__ . '/../includes/nav.php';
   archivo no existe).
 - **`.env`**: configuración local, **ignorado por Git** vía `.gitignore`.
 - **`.env.example`**: ejemplo versionado que sirve de plantilla.
-- **Uso real de las variables:**
+- **Uso de las variables:**
   - `APP_NAME` → `<title>` de todas las páginas (ej. `Mi carrito | BUYDIMA`) y
     copyright del pie.
   - `SUPPORT_EMAIL` → correo mostrado en la página de contacto.
