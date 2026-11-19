@@ -110,8 +110,8 @@ function configurarBuscador() {
         campo.classList.remove('is-invalid');
         // La página destino es distinta según dónde esté el archivo
         const destino = window.location.pathname.includes('/paginas/')
-          ? 'juegos.html'
-          : 'paginas/juegos.html';
+          ? 'juegos.php'
+          : 'paginas/juegos.php';
         form.setAttribute('action', destino);
         form.setAttribute('method', 'get');
       }
@@ -131,7 +131,7 @@ function configurarBotonVolver() {
       if (vieneDelSitio) {
         history.back();
       } else {
-        window.location.href = '../index.html';
+        window.location.href = '../index.php';
       }
     });
   });
@@ -204,7 +204,7 @@ function configurarFavoritos() {
       juego.categoria +
       '</p>' +
       '<div class="acciones-favorito">' +
-      '<a class="boton-compra boton-chico" href="detalle-juego.html?juego=' +
+      '<a class="boton-compra boton-chico" href="detalle-juego.php?juego=' +
       clave +
       '">Ver productos</a>' +
       '<button type="button" class="boton-quitar" data-quitar="' +
@@ -646,7 +646,7 @@ function configurarPerfil() {
     mostrarAviso('Sesión cerrada.');
     actualizarVista();
     setTimeout(() => {
-      window.location.href = '../index.html';
+      window.location.href = '../index.php';
     }, 900);
   });
 
