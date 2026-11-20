@@ -72,9 +72,6 @@ BUYDIMA/
 2. Ejecutar `php -S localhost:8000`.
 3. Abrir `http://localhost:8000/` en el navegador.
 
-> Si el proyecto se clona sin el archivo `.env`, copiar `.env.example` como `.env`
-> (la aplicación usa valores por defecto si no existe).
-
 ## Modularización con includes (SSI)
 
 Los elementos que se repiten en todas las páginas están en `includes/` y se insertan
@@ -179,3 +176,49 @@ La explicación técnica está en [`documentacion.md`](documentacion.md).
 ---
 
 _Proyecto académico. Todos los juegos y marcas mencionados pertenecen a sus respectivos dueños._
+
+## Trabajo Práctico N.º 5 – Procesamiento de Formularios y Seguridad Web
+
+El TP N.º 5 se desarrolló en la carpeta `clase5/` y toma como base el sitio del TP N.º 4. Se agregó el procesamiento de formularios en el servidor y se reforzó la seguridad de los datos que envía el usuario.
+
+### Formulario POST de contacto
+
+La página `clase5/paginas/contacto.php` recibe el formulario por `POST` con los campos nombre, correo, motivo y mensaje. El servidor valida que los campos obligatorios estén completos, que el correo tenga un formato válido con `filter_var()`, que el motivo pertenezca a una lista de opciones permitidas y que el mensaje tenga al menos 10 caracteres. Si hay errores, se vuelve a mostrar el formulario con los datos cargados y el detalle de cada problema. Si todo es correcto, se redirige a `contacto.php?enviado=1` (patrón PRG) para que al actualizar la página no se vuelva a enviar la consulta.
+
+### Búsqueda y filtros GET
+
+El catálogo de `clase5/paginas/juegos.php` usa un formulario `GET` con el parámetro `q`. Si se ingresa texto, la búsqueda debe tener entre 2 y 50 caracteres; si no cumple, se muestra un aviso y no se aplica el filtro de texto. El campo vacío se acepta y muestra todos los juegos. Las categorías se validan contra una lista permitida y, si llega un valor desconocido, se usa `todos`. Los cinco juegos del catálogo se centralizaron en `clase5/config/catalogo.php` y el filtrado se resuelve en PHP antes de imprimir las tarjetas. Los chips de categoría son enlaces construidos con `http_build_query()`; al elegir una categoría se descarta la búsqueda anterior, y al buscar se vuelve a la categoría `todos`. La página muestra la cantidad de resultados y un mensaje cuando no hay coincidencias.
+
+### Medidas de seguridad
+
+- Los campos del formulario y los filtros se leen solo si son cadenas y se recortan con `trim()`; los arreglos se descartan. El parámetro `enviado` se compara de forma estricta con `'1'`.
+- Los valores que llegan por `GET` y `POST` se imprimen en el HTML del servidor con `htmlspecialchars()` (a través de `escapar()`, que usa `ENT_QUOTES`), incluidos el texto buscado, los mensajes de error y los datos del formulario.
+- Las URLs de los chips se arman con `http_build_query()` y también se escapan antes de mostrarse.
+- El motivo del contacto y la categoría del catálogo se validan contra listas blancas.
+- No se confía en ningún parámetro enviado por el usuario.
+
+### Capturas
+
+**1. Formulario de contacto vacío**
+
+![Formulario de contacto vacío](clase5/capturas/01-contacto-vacio.png)
+
+**2. Error de correo inválido**
+
+![Error de correo inválido](clase5/capturas/02-correo-invalido.png)
+
+**3. Consulta enviada correctamente**
+
+![Consulta enviada correctamente](clase5/capturas/03-contacto-correcto.png)
+
+**4. Búsqueda mediante GET**
+
+![Búsqueda mediante GET](clase5/capturas/04-busqueda-get.png)
+
+**5. Filtro por categoría**
+
+![Filtro por categoría](clase5/capturas/05-filtro-categoria.png)
+
+**6. Mensaje sin resultados**
+
+![Mensaje sin resultados](clase5/capturas/06-sin-resultados.png)
