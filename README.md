@@ -4,7 +4,7 @@ BUYDIMA es una tienda online de diamantes y monedas virtuales para videojuegos c
 
 El sitio permite explorar el catálogo de juegos y productos, consultar ofertas, conocer los métodos de pago y acceder a distintas secciones de información y soporte. También cuenta con un panel administrativo para gestionar los productos almacenados en la base de datos.
 
-El proyecto utiliza PHP para el procesamiento del lado del servidor, MySQL para la persistencia de datos y componentes reutilizables mediante `includes`.
+El proyecto utiliza PHP para el procesamiento del lado del servidor, MySQL para la persistencia de datos y componentes reutilizables mediante `includes`. Además, incorpora una organización MVC nativa en PHP y un módulo independiente desarrollado con Laravel.
 
 ## Diseños en Figma
 
@@ -14,66 +14,78 @@ En `mockups/` se encuentran las imágenes de las pantallas diseñadas. Las vista
 
 ## Tecnologías
 
-- PHP 8.x (procesamiento del lado del servidor).
-- MySQL (persistencia de datos).
-- PDO (conexión y consultas preparadas).
+- PHP 8.x.
+- Laravel 13.
+- MySQL.
+- PDO para conexión y consultas preparadas.
+- Eloquent ORM y Query Builder de Laravel.
 - HTML5 semántico.
-- CSS3 (estilos personalizados con variables).
+- CSS3.
 - Bootstrap 5 (CDN) y Bootstrap Icons.
-- JavaScript puro (interacciones, validaciones, carrito y favoritos en localStorage).
-- Sesiones PHP para la autenticación y el control de acceso.
-- `password_hash()` y `password_verify()` para el almacenamiento y la verificación de contraseñas.
-- XAMPP (entorno local de desarrollo).
-- Git y GitHub (control de versiones).
+- JavaScript puro.
+- Fetch API para búsquedas dinámicas.
+- Sesiones PHP para autenticación y control de acceso.
+- Blade para las vistas de Laravel.
+- Composer para la gestión de dependencias.
+- XAMPP y servidor integrado de PHP para desarrollo local.
+- Git y GitHub para control de versiones.
 
 ## Estructura del proyecto
 
 ```text
 BUYDIMA/
-├── index.php
-├── config/
-│   ├── env.php
-│   ├── conexion.php
-│   ├── productos.php
-│   ├── sesion.php
-│   └── auth_guard.php
-├── includes/
-│   ├── header.php
-│   ├── nav.php
-│   ├── footer.php
-│   ├── funciones.php
-│   └── tabla-productos.php
 ├── admin/
-│   ├── index.php
-│   ├── crear.php
-│   ├── editar.php
-│   └── eliminar.php
-├── paginas/
-│   ├── registro.php
-│   ├── login.php
-│   ├── logout.php
-│   ├── perfil.php
-│   ├── historial-compras.php
-│   └── ...
+├── api/
+├── app/
+│   ├── Controllers/
+│   │   └── ProductoController.php
+│   ├── Models/
+│   │   └── Producto.php
+│   └── Views/
+│       └── productos/
+│           └── index.php
+├── config/
 ├── css/
-│   └── estilos.css
+├── includes/
 ├── js/
-│   └── main.js
+├── paginas/
 ├── img/
 ├── mockups/
 ├── capturas/
 ├── clase5/
 ├── tp6/
-├── .env
-├── .env.example
-├── .htaccess
+├── laravel/
+│   ├── app/
+│   │   ├── Http/
+│   │   │   └── Controllers/
+│   │   │       └── ReporteProductoController.php
+│   │   └── Models/
+│   │       ├── Producto.php
+│   │       └── Juego.php
+│   ├── bootstrap/
+│   ├── config/
+│   ├── database/
+│   ├── public/
+│   ├── resources/
+│   │   └── views/
+│   │       └── reportes/
+│   │           └── productos.blade.php
+│   ├── routes/
+│   │   └── web.php
+│   ├── storage/
+│   ├── tests/
+│   ├── artisan
+│   ├── composer.json
+│   └── composer.lock
+├── index.php
 ├── router.php
+├── .env.example
 ├── .gitignore
 ├── README.md
 └── documentacion.md
 ```
 
-## Cómo ejecutarlo en local
+## Cómo ejecutar el proyecto original en local
 
 ### Requisitos
 
@@ -131,7 +143,7 @@ C:\xampp\php\php.exe -S localhost:8000 router.php
 
 Abrir en el navegador:
 
-http://localhost:8000
+[http://localhost:8000](http://localhost:8000)
 
 El servidor integrado de PHP permite probar el proyecto sin depender de la copia que se encuentre dentro de `htdocs`.
 
@@ -162,7 +174,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 El título se genera desde PHP y la navegación identifica la sección activa sin depender de JavaScript.
 
-## Variables de entorno
+## Variables de entorno y conexión
 
 La configuración se centraliza en el archivo `.env`, que se carga mediante `config/env.php`.
 
@@ -183,7 +195,7 @@ El archivo `.env` no se versiona ni debe quedar accesible desde el navegador. `.
 
 La aplicación utiliza MySQL para almacenar la información y PDO para realizar las operaciones desde PHP.
 
-Las consultas se centralizan en `config/productos.php`, donde se encuentran las funciones para listar, buscar, insertar, actualizar y eliminar productos.
+Las consultas del proyecto original se centralizan en `config/productos.php`, donde se encuentran las funciones para listar, buscar, insertar, actualizar y eliminar productos.
 
 Las operaciones de lectura y escritura utilizan consultas preparadas para evitar la inyección SQL.
 
@@ -278,6 +290,133 @@ El archivo `paginas/logout.php` permite cerrar la sesión mediante:
 
 Después del cierre de sesión, las páginas protegidas vuelven a requerir autenticación.
 
+## Búsqueda dinámica de productos
+
+El catálogo incorpora una búsqueda dinámica mediante JavaScript y Fetch API.
+
+El archivo `api/buscar_productos.php` recibe el término de búsqueda, consulta los productos y devuelve los resultados en formato JSON.
+
+La interacción se realiza sin recargar la página. El archivo `js/main.js` procesa la respuesta y actualiza el listado de productos mostrado en el catálogo.
+
+## Refactorización a MVC nativo en PHP
+
+Como parte del Trabajo Práctico N.º 10, se refactorizó el módulo del catálogo de productos utilizando el patrón Modelo-Vista-Controlador (MVC).
+
+La estructura incorporada es:
+
+```text
+app/
+├── Controllers/
+│   └── ProductoController.php
+├── Models/
+│   └── Producto.php
+└── Views/
+    └── productos/
+        └── index.php
+```
+
+Cada componente tiene una responsabilidad diferenciada:
+
+- **Modelo (`Producto.php`):** contiene las operaciones relacionadas con los datos de los productos y las consultas a la base de datos mediante PDO.
+- **Controlador (`ProductoController.php`):** recibe la solicitud, solicita los datos al modelo y prepara la información que necesita la vista.
+- **Vista (`index.php`):** se encarga de presentar los productos mediante HTML y los componentes reutilizables del proyecto.
+
+El archivo `paginas/productos.php` funciona como punto de entrada del módulo y delega el procesamiento al controlador.
+
+Esta organización separa el acceso a datos, la lógica de procesamiento y la presentación, facilitando el mantenimiento y la reutilización del código.
+
+La búsqueda dinámica incorporada anteriormente mediante Fetch API se conserva.
+
+## Implementación de módulo con Laravel
+
+También se incorporó un proyecto Laravel independiente dentro de la carpeta `laravel/`, sin reemplazar ni modificar el funcionamiento del sitio PHP original.
+
+Para el Trabajo Práctico N.º 10 se desarrolló un módulo de reportes de productos.
+
+### Estructura del módulo
+
+```text
+laravel/
+├── app/
+│   ├── Http/
+│   │   └── Controllers/
+│   │       └── ReporteProductoController.php
+│   └── Models/
+│       ├── Producto.php
+│       └── Juego.php
+├── resources/
+│   └── views/
+│       └── reportes/
+│           └── productos.blade.php
+└── routes/
+    └── web.php
+```
+
+### Componentes
+
+- **Ruta (`routes/web.php`):** define el acceso al reporte de productos.
+- **Controlador (`ReporteProductoController.php`):** obtiene los datos necesarios y prepara la información del reporte.
+- **Modelos (`Producto.php` y `Juego.php`):** representan las entidades de la base de datos y permiten trabajar con sus registros mediante Eloquent ORM.
+- **Vista (`productos.blade.php`):** utiliza Blade para presentar los resultados.
+
+### Funcionalidad del reporte
+
+El módulo muestra información de los productos activos:
+
+- Cantidad total de productos activos.
+- Stock total.
+- Precio promedio.
+- Listado de productos con su juego, precio y stock.
+
+La ruta de acceso es:
+
+```text
+/reportes/productos
+```
+
+El módulo utiliza la base de datos `buydima`, por lo que consulta los datos existentes del proyecto.
+
+### Ejecutar Laravel en local
+
+Para ejecutar este módulo se necesita PHP, Composer y MySQL.
+
+1. Abrir una terminal dentro de la carpeta `laravel/`.
+2. Instalar las dependencias:
+
+```bash
+composer install
+```
+
+3. Crear el archivo `.env` tomando como referencia `.env.example` y configurar la conexión a la base de datos `buydima`.
+
+4. Generar la clave de la aplicación:
+
+```bash
+php artisan key:generate
+```
+
+5. Configurar `SESSION_DRIVER=file` en el `.env` para utilizar sesiones almacenadas en archivos.
+
+6. Limpiar la configuración almacenada:
+
+```bash
+php artisan config:clear
+```
+
+7. Iniciar el servidor:
+
+```bash
+php artisan serve --port=8001
+```
+
+Abrir en el navegador:
+
+[http://127.0.0.1:8001/reportes/productos](http://127.0.0.1:8001/reportes/productos)
+
+El módulo Laravel se ejecuta de forma independiente al servidor PHP original.
+
+El archivo `laravel/.env` contiene la configuración local y no debe subirse a GitHub. Las dependencias instaladas en `laravel/vendor/` tampoco se versionan.
+
 ## Medidas de seguridad
 
 Se aplican distintas medidas para proteger los datos y las operaciones de la aplicación:
@@ -286,7 +425,7 @@ Se aplican distintas medidas para proteger los datos y las operaciones de la apl
 - Validación de los datos recibidos mediante formularios.
 - Uso de `htmlspecialchars()` para escapar los valores dinámicos que se muestran en HTML.
 - Variables de entorno para mantener separadas las credenciales de la configuración del código.
-- Exclusión del archivo `.env` mediante `.gitignore`.
+- Exclusión de los archivos `.env` mediante `.gitignore`.
 - Protección del acceso directo al archivo `.env` mediante la configuración del servidor.
 - Eliminación de productos mediante solicitudes POST y confirmación previa.
 - Restricciones de claves foráneas para conservar la integridad de los datos relacionados con pedidos.
@@ -313,6 +452,7 @@ El sitio contiene distintas secciones:
 11. Menú hamburguesa y navegación global.
 12. Detalle de juego, con identificación del usuario y selección de paquetes.
 13. Panel administrativo para gestionar productos.
+14. Reporte de productos desarrollado con Laravel.
 
 Las interacciones de carrito, favoritos y algunas funciones de perfil son demostrativas y utilizan almacenamiento local del navegador. No se encuentran implementados los pagos ni los envíos reales de recargas.
 

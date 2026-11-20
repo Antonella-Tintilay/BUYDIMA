@@ -501,7 +501,48 @@ También se verificó que los archivos PHP del proyecto no presentaran errores d
 
 ---
 
-## 14. Conclusión
+## 14. Refactorización a MVC nativo en PHP (TP10)
+
+Como parte del Trabajo Práctico N.º 10, se refactorizó el módulo de productos utilizando el patrón de arquitectura MVC (Modelo-Vista-Controlador).
+
+Se reorganizó el código en las siguientes carpetas:
+
+- `app/Models/`: contiene el modelo `Producto.php`, encargado de realizar las consultas a la base de datos mediante PDO.
+- `app/Controllers/`: contiene `ProductoController.php`, que recibe las solicitudes y coordina la comunicación entre el modelo y la vista.
+- `app/Views/`: contiene la vista `productos/index.php`, encargada de mostrar el catálogo de productos.
+
+El archivo `paginas/productos.php` funciona como punto de entrada y delega la ejecución al controlador.
+
+Esta organización permite separar las responsabilidades del sistema y facilita el mantenimiento del código.
+
+## 15. Implementación de un módulo con Laravel (TP10)
+
+Para la segunda parte del trabajo práctico se incorporó Laravel como framework PHP, creando un proyecto independiente dentro de la carpeta `laravel/`.
+
+Se implementó un módulo de reporte de productos que permite consultar información de los productos activos de la tienda.
+
+El módulo utiliza:
+
+- **Rutas:** definidas en `routes/web.php`.
+- **Controlador:** `ReporteProductoController.php`, encargado de procesar la solicitud y preparar los datos.
+- **Modelos:** `Producto.php` y `Juego.php`, que representan las entidades de la base de datos.
+- **Vista:** `productos.blade.php`, que utiliza el motor de plantillas Blade para mostrar el reporte.
+
+El reporte presenta el total de productos activos, el stock total, el precio promedio y un listado con el nombre del producto, el juego al que pertenece, su precio y su stock.
+
+Para acceder al módulo se utiliza la ruta `/reportes/productos`.
+
+## 16. Organización y control de versiones del TP10
+
+Los cambios correspondientes al Trabajo Práctico N.º 10 se realizaron en una rama independiente de Git llamada `feature/tp10-mvc-framework`.
+
+Se mantuvo separada la aplicación PHP original del proyecto Laravel para evitar afectar las funcionalidades desarrolladas en los trabajos prácticos anteriores.
+
+Se verificó el funcionamiento del catálogo refactorizado, la búsqueda dinámica de productos y el nuevo reporte implementado con Laravel.
+
+Los cambios fueron registrados mediante un commit y enviados al repositorio remoto de GitHub.
+
+## 17.Conclusión
 
 BUYDIMA evolucionó desde una interfaz de tienda online hacia una aplicación con persistencia de datos y funcionalidades del lado del servidor.
 
