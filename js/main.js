@@ -290,6 +290,119 @@ function configurarFavoritos() {
   dibujar();
 }
 
+
+// ---------- Buscador dinámico de productos ----------
+
+function configurarProductos() {
+  const campo = document.getElementById('buscador-productos');
+  const resultados = document.getElementById('resultados-productos');
+  const cantidad = document.getElementById('cantidad-productos');
+  const mensaje = document.getElementById('mensaje-busqueda');
+
+  if (!campo || !resultados || !cantidad || !mensaje) return;
+
+  let solicitudActual = null;
+
+  function actualizarCantidad(total) {
+    cantidad.textContent = total + (total === 1 ? ' producto' : ' productos');
+  }
+
+  function crearCelda(valor, encabezado = false) {
+    const celda = document.createElement(encabezado ? 'th' : 'td');
+    celda.textContent = valor;
+
+    if (encabezado) celda.scope = 'col';
+
+    return celda;
+  }
+
+  function mostrarProductos(productos) {
+    resultados.replaceChildren();
+
+    if (productos.length === 0) {
+      const estadoVacio = document.createElement('p');
+      estadoVacio.className = 'texto-suave py-3';
+      estadoVacio.textContent = 'No se encontraron productos.';
+      resultados.appendChild(estadoVacio);
+      actualizarCantidad(0);
+      return;
+    }
+
+    const contenedor = document.createElement('div');
+    contenedor.className = 'table-responsive';
+
+    const tabla = document.createElement('table');
+    tabla.className = 'table align-middle';
+
+    const encabezado = document.createElement('thead');
+    const filaEncabezado = document.createElement('tr');
+
+    ['Producto', 'Juego', 'Precio', 'Stock'].forEach((titulo) => {
+      filaEncabezado.appendChild(crearCelda(titulo, true));
+    });
+
+    encabezado.appendChild(filaEncabezado);
+
+    const cuerpo = document.createElement('tbody');
+
+    productos.forEach((producto) => {
+      const fila = document.createElement('tr');
+
+      fila.appendChild(crearCelda(producto.nombre_producto));
+      fila.appendChild(crearCelda(producto.juego));
+      fila.appendChild(crearCelda(formatearPrecio(Number(producto.precio))));
+      fila.appendChild(crearCelda(String(producto.stock)));
+
+      cuerpo.appendChild(fila);
+    });
+
+    tabla.append(encabezado, cuerpo);
+    contenedor.appendChild(tabla);
+    resultados.appendChild(contenedor);
+
+    actualizarCantidad(productos.length);
+  }
+
+  async function buscarProductos() {
+    const busqueda = campo.value.trim();
+
+    if (solicitudActual) {
+      solicitudActual.abort();
+    }
+
+    solicitudActual = new AbortController();
+
+    mensaje.textContent = 'Buscando productos...';
+
+    try {
+      const respuesta = await fetch('../api/buscar_productos.php?q=' + encodeURIComponent(busqueda), {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json'
+        },
+        signal: solicitudActual.signal
+      });
+
+      const datos = await respuesta.json();
+
+      if (!respuesta.ok || datos.status !== 'success') {
+        throw new Error(datos.mensaje || 'No se pudieron obtener los productos.');
+      }
+
+      mostrarProductos(datos.data);
+      mensaje.textContent = '';
+
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+
+      console.error('Error al buscar productos:', error);
+      mensaje.textContent = 'Ocurrió un error al buscar productos. Intentá nuevamente.';
+    }
+  }
+
+  campo.addEventListener('input', buscarProductos);
+}
+
 // ============================================================
 // Inicialización por página
 // Cada página tiene <body data-pagina="..."> y acá se configura
@@ -329,6 +442,9 @@ document.addEventListener('DOMContentLoaded', () => {
       break;
     case 'favoritos':
       configurarFavoritos();
+      break;
+    case 'productos':
+      configurarProductos();
       break;
   }
 });
