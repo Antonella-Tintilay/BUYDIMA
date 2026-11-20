@@ -7,6 +7,12 @@ $items_menu = [
   ['id' => 'inicio', 'href' => $ruta_base . '/index.php', 'icono' => 'bi-house', 'texto' => 'Inicio'],
   ['id' => 'juegos', 'href' => $ruta_base . '/paginas/juegos.php', 'icono' => 'bi-controller', 'texto' => 'Juegos'],
   [
+    'id' => 'productos',
+    'href' => $ruta_base . '/paginas/productos.php',
+    'icono' => 'bi-box-seam',
+    'texto' => 'Productos',
+  ],
+  [
     'id' => 'ofertas',
     'href' => $ruta_base . '/paginas/ofertas.php',
     'icono' => 'bi-percent',

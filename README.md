@@ -1,224 +1,233 @@
 # BUYDIMA — Tienda de recargas de juegos y monedas virtuales
 
-Tienda online de diamantes y monedas virtuales (Free Fire, Mobile Legends, Roblox,
-Genshin Impact, Battlegrounds). Es el **TP N.º 4 de Programación Web**.
+BUYDIMA es una tienda online de diamantes y monedas virtuales para videojuegos como Free Fire, Mobile Legends, Roblox, Genshin Impact y Battlegrounds.
 
-El sitio se maquetó en el TP N.º 3 con HTML5 y Bootstrap 5, y en este TP se migró a
-**PHP**: las páginas se renderizan en el servidor (SSR), los elementos comunes se
-reutilizan con **includes (SSI)** y la configuración se lee de **variables de entorno**.
+El sitio permite explorar el catálogo de juegos y productos, consultar ofertas, conocer los métodos de pago y acceder a distintas secciones de información y soporte. También cuenta con un panel administrativo para gestionar los productos almacenados en la base de datos.
+
+El proyecto utiliza PHP para el procesamiento del lado del servidor, MySQL para la persistencia de datos y componentes reutilizables mediante `includes`.
 
 ## Diseños en Figma
 
 [Ver proyecto BUYDIMA en Figma](https://www.figma.com/design/FG1K8az0lhOJ4UW6jQHqwA/BUYDIMA?node-id=0-1&t=SuZde1xKh9fQQfyJ-1)
 
-En `mockups/` están las imágenes de las pantallas diseñadas. Las vistas **detalle de
-juego** (ID de usuario y paquetes) y **mis favoritos** no están en Figma: se hicieron
-directamente en el sitio y quedan pendientes de agregar al diseño.
+En `mockups/` se encuentran las imágenes de las pantallas diseñadas. Las vistas de detalle de juego (ID de usuario y paquetes) y mis favoritos se desarrollaron directamente en el sitio y quedan pendientes de incorporar al diseño.
 
 ## Tecnologías
 
-- PHP 8.x (renderizado del lado del servidor, includes y variables de entorno)
-- HTML5 semántico
-- CSS3 (estilos personalizados con variables)
-- Bootstrap 5 (CDN) + Bootstrap Icons
-- JavaScript puro (interacciones, validaciones, carrito y favoritos en localStorage)
-- XAMPP o Laragon como servidor local de pruebas
-- Prettier (formato de código)
-- Git Workflow
+- PHP 8.x (procesamiento del lado del servidor).
+- MySQL (persistencia de datos).
+- PDO (conexión y consultas preparadas).
+- HTML5 semántico.
+- CSS3 (estilos personalizados con variables).
+- Bootstrap 5 (CDN) y Bootstrap Icons.
+- JavaScript puro (interacciones, validaciones, carrito y favoritos en localStorage).
+- XAMPP (entorno local de desarrollo).
+- Git y GitHub (control de versiones).
 
 ## Estructura del proyecto
 
-```
+```text
 BUYDIMA/
-├── index.php                   # Inicio
+├── index.php
 ├── config/
-│   └── env.php                 # Cargador de variables de entorno (.env)
-├── includes/                   # Componentes comunes (SSI)
-│   ├── header.php              # <head>, título dinámico y apertura del documento
-│   ├── nav.php                 # Navegación principal, buscador y menú hamburguesa
-│   └── footer.php              # Pie de página y scripts
-├── paginas/                    # Las otras 9 vistas (juegos, ofertas, carrito, etc.)
-├── css/estilos.css             # Estilos personalizados
-├── js/main.js                  # Interacciones de todo el sitio
-├── img/                        # Imágenes y logos de los juegos
-├── mockups/                    # Mockups originales del diseño
-├── .env                        # Configuración local (no se sube a GitHub)
-├── .env.example                # Ejemplo de configuración (versionado)
+│   ├── env.php
+│   ├── conexion.php
+│   └── productos.php
+├── includes/
+│   ├── header.php
+│   ├── nav.php
+│   ├── footer.php
+│   ├── funciones.php
+│   └── tabla-productos.php
+├── admin/
+│   ├── index.php
+│   ├── crear.php
+│   ├── editar.php
+│   └── eliminar.php
+├── paginas/
+│   └── ...
+├── css/
+│   └── estilos.css
+├── js/
+│   └── main.js
+├── img/
+├── mockups/
+├── capturas/
+├── clase5/
+├── tp6/
+├── .env
+├── .env.example
+├── .htaccess
+├── router.php
 ├── .gitignore
 ├── README.md
-├── documentacion.md            # Documentación técnica del TP
-└── .prettierrc
+└── documentacion.md
 ```
 
 ## Cómo ejecutarlo en local
 
-**Requisitos:** PHP 8.x con un servidor local (XAMPP o Laragon), o PHP en el PATH.
+### Requisitos
 
-**Opción 1 — XAMPP:**
+- PHP 8.x.
+- MySQL.
+- XAMPP o un entorno local equivalente.
+- Extensiones de PHP `PDO` y `pdo_mysql` habilitadas.
 
-1. Copiar (o clonar) el proyecto en `C:\xampp\htdocs\BUYDIMA`.
-2. Iniciar Apache desde el panel de XAMPP.
-3. Abrir `http://localhost/BUYDIMA/` en el navegador.
+### 1. Configurar la base de datos
 
-**Opción 2 — Laragon:**
+Crear la base de datos `buydima` en MySQL y ejecutar los scripts SQL ubicados en `tp6/`:
 
-1. Copiar el proyecto en `C:\laragon\www\BUYDIMA`.
-2. Iniciar Laragon y pulsar "Start All".
-3. Abrir `http://localhost/BUYDIMA/` (o el dominio `http://buydima.test` si usás pretty URLs).
+- `schema.sql`: creación de las tablas y relaciones.
+- `consultas.sql`: consultas de comprobación y ejemplos.
 
-**Opción 3 — servidor embebido de PHP (sin XAMPP ni Laragon):**
+El esquema contiene siete tablas:
 
-1. Abrir una terminal en la carpeta del proyecto.
-2. Ejecutar `php -S localhost:8000`.
-3. Abrir `http://localhost:8000/` en el navegador.
+- `roles`
+- `usuarios`
+- `juegos`
+- `productos`
+- `estados_pedido`
+- `pedidos`
+- `detalle_pedido`
 
-## Modularización con includes (SSI)
+### 2. Configurar las variables de entorno
 
-Los elementos que se repiten en todas las páginas están en `includes/` y se insertan
-con `require_once __DIR__ . '/../includes/...'` en cada página:
+Crear el archivo `.env` en la carpeta principal del proyecto, tomando como referencia `.env.example`.
 
-- `header.php`: `<head>` con **título dinámico** (`$titulo_pagina`), meta descripción,
-  favicon, CSS y apertura del `<body>`.
-- `nav.php`: navbar, buscador, accesos al perfil/carrito y menú hamburguesa; marca el
-  enlace activo según `$pagina_activa` y agrega `aria-current="page"`.
-- `footer.php`: pie de página y scripts.
-
-Las páginas de la raíz usan `$ruta_base = '.'` y las de `paginas/` usan `..`;
-las rutas de archivos se resuelven con `__DIR__`, así los includes funcionan igual
-desde cualquier nivel.
-
-### 📸 Captura 1 — Sitio funcionando en `http://localhost/BUYDIMA/`
-
-![Sitio de BUYDIMA funcionando en http://localhost/BUYDIMA/](capturas/01-sitio-localhost.png)
-
-## Títulos dinámicos (SSR)
-
-Cada página define sus variables **antes** de incluir el header:
-
-```php
-<?php
-$titulo_pagina = 'Mi carrito | ' . APP_NAME;
-$pagina_activa = 'carrito';
-require_once __DIR__ . '/../includes/header.php';
-```
-
-`header.php` imprime el título y `nav.php` marca la sección activa, todo desde el
-servidor, sin JavaScript.
-
-### 📸 Captura 2 — Código PHP de los includes (header, nav y footer)
-
-**`includes/header.php`**
-
-![Código de includes/header.php: parte superior](capturas/02a-header-superior.png)
-
-![Código de includes/header.php: parte inferior](capturas/02b-header-inferior.png)
-
-**`includes/nav.php`**
-
-![Código de includes/nav.php: array con los ítems del menú](capturas/02c-nav.png)
-
-![Código de includes/nav.php: navbar con el logo y el buscador](capturas/02d-nav.png)
-
-![Código de includes/nav.php: menú hamburguesa y detección de la página activa](capturas/02e-nav.png)
-
-**`includes/footer.php`**
-
-![Código de includes/footer.php: parte superior, con el logo y las redes sociales](capturas/02f-footer-superior.png)
-
-![Código de includes/footer.php: parte inferior, con las columnas de información y ayuda](capturas/02g-footer-inferior.png)
-
-### 📸 Captura 3 — Título dinámico y navegación activa
-
-![Título dinámico definido en index.php](capturas/03a-titulo-dinamico.png)
-
-![Menú con la sección activa en juegos.php](capturas/03b-menu-activo.png)
-
-## Variables de entorno
-
-La configuración está en `.env` (local, ignorado por Git) y se carga con
-`config/env.php` (PHP nativo, sin Composer):
+Completar los datos de conexión a MySQL:
 
 ```env
 APP_NAME=BUYDIMA
 SUPPORT_EMAIL=soporte@buydima.com
 APP_ENV=local
+
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=buydima
+DB_USER=root
+DB_PASSWORD=
 ```
 
-- `APP_NAME` se usa en los `<title>` y en el pie de página.
-- `SUPPORT_EMAIL` se muestra en la página de contacto.
-- Para cambiar la configuración, editá `.env` (crealo a partir de `.env.example`).
+Los valores de conexión deben corresponder a la configuración local de MySQL.
 
-### 📸 Captura 4 — Archivo `.env.example`
+El archivo `.env` contiene información privada y no debe subirse a GitHub. Se encuentra excluido mediante `.gitignore`.
 
-![Contenido del archivo .env.example](capturas/04-env-example.png)
+### 3. Iniciar el servidor
 
-## Vistas incluidas (11)
+Desde una terminal ubicada en la carpeta principal del proyecto, ejecutar:
 
-1. Inicio
-2. Todos los juegos (catálogo con búsqueda y filtros por categoría)
-3. Ofertas especiales (con cuenta regresiva)
-4. Métodos de pago
-5. Contacto y soporte (formulario validado)
-6. Mi carrito (cantidades, código de descuento y resumen)
-7. Mi perfil (edición de datos)
-8. Historial de compras
-9. Mis favoritos (juegos guardados, persisten en el navegador)
-10. Menú hamburguesa (componente global en todas las páginas)
-11. Detalle de juego (ID de usuario + paquetes de diamantes y pases)
+```powershell
+C:\xampp\php\php.exe -S localhost:8000 router.php
+```
 
-> Todas las interacciones (carrito, favoritos, sesión, formularios) son de
-> **demostración**: no hay pagos, cuentas, registros ni envíos reales.
+Abrir en el navegador:
+
+http://localhost:8000
+
+El servidor integrado de PHP permite probar el proyecto sin depender de la copia que se encuentre dentro de `htdocs`.
+
+## Modularización con includes
+
+Los elementos que se repiten en las páginas se encuentran en la carpeta `includes/` y se incorporan mediante `require_once`.
+
+- `header.php`: contiene el encabezado HTML, metadatos, título dinámico, CSS y apertura del documento.
+- `nav.php`: contiene la navegación principal, el buscador, los accesos al perfil y al carrito, y el menú hamburguesa.
+- `footer.php`: contiene el pie de página y los scripts.
+- `funciones.php`: reúne funciones auxiliares para el procesamiento y la presentación de datos.
+- `tabla-productos.php`: permite reutilizar la presentación de los productos.
+
+Las rutas se resuelven mediante `__DIR__` para que los archivos incluidos puedan encontrarse correctamente desde distintos niveles de carpetas.
+
+## Títulos dinámicos y renderizado del lado del servidor
+
+Cada página puede definir sus variables antes de incorporar el encabezado:
+
+```php
+<?php
+
+$titulo_pagina = 'Mi carrito | ' . APP_NAME;
+$pagina_activa = 'carrito';
+
+require_once __DIR__ . '/../includes/header.php';
+```
+
+El título se genera desde PHP y la navegación identifica la sección activa sin depender de JavaScript.
+
+## Variables de entorno
+
+La configuración se centraliza en el archivo `.env`, que se carga mediante `config/env.php`.
+
+Se utilizan variables para identificar el nombre de la aplicación, el correo de soporte y los datos necesarios para conectarse a MySQL.
+
+La conexión a la base de datos se encuentra centralizada en `config/conexion.php` y utiliza PDO.
+
+La configuración establece:
+
+- Juego de caracteres `utf8mb4`.
+- Manejo de errores mediante excepciones.
+- Resultados obtenidos como arreglos asociativos.
+- Consultas preparadas nativas.
+
+El archivo `.env` no se versiona ni debe quedar accesible desde el navegador. `.env.example` contiene valores de referencia sin credenciales reales.
+
+## Conexión y persistencia de datos
+
+La aplicación utiliza MySQL para almacenar la información y PDO para realizar las operaciones desde PHP.
+
+Las consultas se centralizan en `config/productos.php`, donde se encuentran las funciones para listar, buscar, insertar, actualizar y eliminar productos.
+
+Las operaciones de lectura y escritura utilizan consultas preparadas para evitar la inyección SQL.
+
+## Catálogo público y panel administrativo
+
+El catálogo público permite consultar los juegos y productos disponibles sin acceder al panel de administración.
+
+El panel administrativo se encuentra en `admin/` y permite realizar las operaciones CRUD sobre los productos:
+
+- **Crear:** registrar un producto y asociarlo a un juego.
+- **Leer:** consultar el listado de productos almacenados.
+- **Actualizar:** modificar los datos de un producto existente.
+- **Eliminar:** eliminar productos que no estén asociados a pedidos existentes.
+
+Los formularios realizan validaciones del lado del servidor antes de guardar los cambios.
+
+Cuando un producto está relacionado con pedidos, la base de datos impide su eliminación para conservar el historial de compras.
+
+## Medidas de seguridad
+
+Se aplican distintas medidas para proteger los datos y las operaciones de la aplicación:
+
+- Consultas preparadas mediante PDO para evitar inyección SQL.
+- Validación de los datos recibidos mediante formularios.
+- Uso de `htmlspecialchars()` para escapar los valores dinámicos que se muestran en HTML.
+- Variables de entorno para mantener separadas las credenciales de la configuración del código.
+- Exclusión del archivo `.env` mediante `.gitignore`.
+- Protección del acceso directo al archivo `.env` mediante la configuración del servidor.
+- Eliminación de productos mediante solicitudes POST y confirmación previa.
+- Restricciones de claves foráneas para conservar la integridad de los datos relacionados con pedidos.
+
+## Vistas y funcionalidades
+
+El sitio contiene distintas secciones:
+
+1. Inicio.
+2. Todos los juegos, con búsqueda y filtros por categoría.
+3. Ofertas especiales, con cuenta regresiva.
+4. Métodos de pago.
+5. Contacto y soporte, con formulario validado.
+6. Mi carrito, con cantidades, código de descuento y resumen.
+7. Mi perfil.
+8. Historial de compras.
+9. Mis favoritos, almacenados en el navegador.
+10. Menú hamburguesa y navegación global.
+11. Detalle de juego, con identificación del usuario y selección de paquetes.
+
+Las interacciones de carrito, favoritos y algunas funciones de perfil son demostrativas y utilizan almacenamiento local del navegador. No se encuentran implementados los pagos ni los envíos reales de recargas.
 
 ## Documentación
 
-La explicación técnica está en [`documentacion.md`](documentacion.md).
+La explicación técnica y el desarrollo de las funcionalidades se encuentran en [documentacion.md](documentacion.md).
 
 ---
 
-_Proyecto académico. Todos los juegos y marcas mencionados pertenecen a sus respectivos dueños._
-
-## Trabajo Práctico N.º 5 – Procesamiento de Formularios y Seguridad Web
-
-El TP N.º 5 se desarrolló en la carpeta `clase5/` y toma como base el sitio del TP N.º 4. Se agregó el procesamiento de formularios en el servidor y se reforzó la seguridad de los datos que envía el usuario.
-
-### Formulario POST de contacto
-
-La página `clase5/paginas/contacto.php` recibe el formulario por `POST` con los campos nombre, correo, motivo y mensaje. El servidor valida que los campos obligatorios estén completos, que el correo tenga un formato válido con `filter_var()`, que el motivo pertenezca a una lista de opciones permitidas y que el mensaje tenga al menos 10 caracteres. Si hay errores, se vuelve a mostrar el formulario con los datos cargados y el detalle de cada problema. Si todo es correcto, se redirige a `contacto.php?enviado=1` (patrón PRG) para que al actualizar la página no se vuelva a enviar la consulta.
-
-### Búsqueda y filtros GET
-
-El catálogo de `clase5/paginas/juegos.php` usa un formulario `GET` con el parámetro `q`. Si se ingresa texto, la búsqueda debe tener entre 2 y 50 caracteres; si no cumple, se muestra un aviso y no se aplica el filtro de texto. El campo vacío se acepta y muestra todos los juegos. Las categorías se validan contra una lista permitida y, si llega un valor desconocido, se usa `todos`. Los cinco juegos del catálogo se centralizaron en `clase5/config/catalogo.php` y el filtrado se resuelve en PHP antes de imprimir las tarjetas. Los chips de categoría son enlaces construidos con `http_build_query()`; al elegir una categoría se descarta la búsqueda anterior, y al buscar se vuelve a la categoría `todos`. La página muestra la cantidad de resultados y un mensaje cuando no hay coincidencias.
-
-### Medidas de seguridad
-
-- Los campos del formulario y los filtros se leen solo si son cadenas y se recortan con `trim()`; los arreglos se descartan. El parámetro `enviado` se compara de forma estricta con `'1'`.
-- Los valores que llegan por `GET` y `POST` se imprimen en el HTML del servidor con `htmlspecialchars()` (a través de `escapar()`, que usa `ENT_QUOTES`), incluidos el texto buscado, los mensajes de error y los datos del formulario.
-- Las URLs de los chips se arman con `http_build_query()` y también se escapan antes de mostrarse.
-- El motivo del contacto y la categoría del catálogo se validan contra listas blancas.
-- No se confía en ningún parámetro enviado por el usuario.
-
-### Capturas
-
-**1. Formulario de contacto vacío**
-
-![Formulario de contacto vacío](clase5/capturas/01-contacto-vacio.png)
-
-**2. Error de correo inválido**
-
-![Error de correo inválido](clase5/capturas/02-correo-invalido.png)
-
-**3. Consulta enviada correctamente**
-
-![Consulta enviada correctamente](clase5/capturas/03-contacto-correcto.png)
-
-**4. Búsqueda mediante GET**
-
-![Búsqueda mediante GET](clase5/capturas/04-busqueda-get.png)
-
-**5. Filtro por categoría**
-
-![Filtro por categoría](clase5/capturas/05-filtro-categoria.png)
-
-**6. Mensaje sin resultados**
-
-![Mensaje sin resultados](clase5/capturas/06-sin-resultados.png)
+*Proyecto académico. Todos los juegos y marcas mencionados pertenecen a sus respectivos propietarios.*
