@@ -1,44 +1,64 @@
+
 <?php
+require_once __DIR__ . '/../config/sesion.php';
+iniciar_sesion_segura();
+
 $ruta_base = $ruta_base ?? '.';
 $pagina_activa = $pagina_activa ?? '';
 
-// Elementos del menú: si $pagina_activa coincide con el 'id', el enlace se marca activo.
+$usuario_conectado = isset($_SESSION['usuario_id']);
+$rol_usuario = $_SESSION['rol'] ?? '';
+
 $items_menu = [
   ['id' => 'inicio', 'href' => $ruta_base . '/index.php', 'icono' => 'bi-house', 'texto' => 'Inicio'],
   ['id' => 'juegos', 'href' => $ruta_base . '/paginas/juegos.php', 'icono' => 'bi-controller', 'texto' => 'Juegos'],
-  [
-    'id' => 'productos',
-    'href' => $ruta_base . '/paginas/productos.php',
-    'icono' => 'bi-box-seam',
-    'texto' => 'Productos',
-  ],
-  [
-    'id' => 'ofertas',
-    'href' => $ruta_base . '/paginas/ofertas.php',
-    'icono' => 'bi-percent',
-    'texto' => 'Ofertas especiales',
-  ],
-  [
-    'id' => 'metodos-pago',
-    'href' => $ruta_base . '/paginas/metodos-pago.php',
-    'icono' => 'bi-credit-card-2-front',
-    'texto' => 'Métodos de pago',
-  ],
-  [
-    'id' => 'favoritos',
-    'href' => $ruta_base . '/paginas/favoritos.php',
-    'icono' => 'bi-heart',
-    'texto' => 'Mis favoritos',
-  ],
-  [
-    'id' => 'contacto',
-    'href' => $ruta_base . '/paginas/contacto.php',
-    'icono' => 'bi-headset',
-    'texto' => 'Contacto y soporte',
-  ],
-  ['id' => 'perfil', 'href' => $ruta_base . '/paginas/perfil.php', 'icono' => 'bi-person', 'texto' => 'Mi cuenta'],
+  ['id' => 'productos', 'href' => $ruta_base . '/paginas/productos.php', 'icono' => 'bi-box-seam', 'texto' => 'Productos'],
+  ['id' => 'ofertas', 'href' => $ruta_base . '/paginas/ofertas.php', 'icono' => 'bi-percent', 'texto' => 'Ofertas especiales'],
+  ['id' => 'metodos-pago', 'href' => $ruta_base . '/paginas/metodos-pago.php', 'icono' => 'bi-credit-card-2-front', 'texto' => 'Métodos de pago'],
+  ['id' => 'favoritos', 'href' => $ruta_base . '/paginas/favoritos.php', 'icono' => 'bi-heart', 'texto' => 'Mis favoritos'],
+  ['id' => 'contacto', 'href' => $ruta_base . '/paginas/contacto.php', 'icono' => 'bi-headset', 'texto' => 'Contacto y soporte'],
 ];
+
+if ($usuario_conectado) {
+    $items_menu[] = [
+        'id' => 'perfil',
+        'href' => $ruta_base . '/paginas/perfil.php',
+        'icono' => 'bi-person',
+        'texto' => 'Mi cuenta',
+    ];
+
+    if ($rol_usuario === 'administrador') {
+        $items_menu[] = [
+            'id' => 'administracion',
+            'href' => $ruta_base . '/admin/index.php',
+            'icono' => 'bi-gear',
+            'texto' => 'Administración',
+        ];
+    }
+
+    $items_menu[] = [
+        'id' => 'logout',
+        'href' => $ruta_base . '/paginas/logout.php',
+        'icono' => 'bi-box-arrow-right',
+        'texto' => 'Cerrar sesión',
+    ];
+} else {
+    $items_menu[] = [
+        'id' => 'login',
+        'href' => $ruta_base . '/paginas/login.php',
+        'icono' => 'bi-person',
+        'texto' => 'Iniciar sesión',
+    ];
+
+    $items_menu[] = [
+        'id' => 'registro',
+        'href' => $ruta_base . '/paginas/registro.php',
+        'icono' => 'bi-person-plus',
+        'texto' => 'Registrarse',
+    ];
+}
 ?>
+
 <header class="encabezado-sitio">
   <nav class="navbar navbar-expand-md py-3" aria-label="Navegación principal">
     <div class="container d-flex align-items-center justify-content-between gap-3">
@@ -84,8 +104,8 @@ $items_menu = [
       <div class="d-flex align-items-center gap-1">
         <a
           class="boton-icono"
-          href="<?php echo htmlspecialchars($ruta_base); ?>/paginas/perfil.php"
-          aria-label="Mi cuenta"
+          href="<?php echo htmlspecialchars($ruta_base); ?>/paginas/<?php echo $usuario_conectado ? 'perfil.php' : 'login.php'; ?>"
+          aria-label="<?php echo $usuario_conectado ? 'Mi cuenta' : 'Iniciar sesión'; ?>"
         >
           <i class="bi bi-person" aria-hidden="true"></i>
         </a>

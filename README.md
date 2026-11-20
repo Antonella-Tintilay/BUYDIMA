@@ -21,6 +21,8 @@ En `mockups/` se encuentran las imágenes de las pantallas diseñadas. Las vista
 - CSS3 (estilos personalizados con variables).
 - Bootstrap 5 (CDN) y Bootstrap Icons.
 - JavaScript puro (interacciones, validaciones, carrito y favoritos en localStorage).
+- Sesiones PHP para la autenticación y el control de acceso.
+- `password_hash()` y `password_verify()` para el almacenamiento y la verificación de contraseñas.
 - XAMPP (entorno local de desarrollo).
 - Git y GitHub (control de versiones).
 
@@ -32,7 +34,9 @@ BUYDIMA/
 ├── config/
 │   ├── env.php
 │   ├── conexion.php
-│   └── productos.php
+│   ├── productos.php
+│   ├── sesion.php
+│   └── auth_guard.php
 ├── includes/
 │   ├── header.php
 │   ├── nav.php
@@ -45,6 +49,11 @@ BUYDIMA/
 │   ├── editar.php
 │   └── eliminar.php
 ├── paginas/
+│   ├── registro.php
+│   ├── login.php
+│   ├── logout.php
+│   ├── perfil.php
+│   ├── historial-compras.php
 │   └── ...
 ├── css/
 │   └── estilos.css
@@ -131,7 +140,7 @@ El servidor integrado de PHP permite probar el proyecto sin depender de la copia
 Los elementos que se repiten en las páginas se encuentran en la carpeta `includes/` y se incorporan mediante `require_once`.
 
 - `header.php`: contiene el encabezado HTML, metadatos, título dinámico, CSS y apertura del documento.
-- `nav.php`: contiene la navegación principal, el buscador, los accesos al perfil y al carrito, y el menú hamburguesa.
+- `nav.php`: contiene la navegación principal, el buscador, los accesos al perfil y al carrito, y el menú hamburguesa. También adapta las opciones según el estado de autenticación y el rol del usuario.
 - `footer.php`: contiene el pie de página y los scripts.
 - `funciones.php`: reúne funciones auxiliares para el procesamiento y la presentación de datos.
 - `tabla-productos.php`: permite reutilizar la presentación de los productos.
@@ -193,6 +202,82 @@ Los formularios realizan validaciones del lado del servidor antes de guardar los
 
 Cuando un producto está relacionado con pedidos, la base de datos impide su eliminación para conservar el historial de compras.
 
+## Autenticación, sesiones y control de acceso
+
+El proyecto incorpora un sistema de autenticación del lado del servidor mediante PHP y MySQL.
+
+### Registro de usuarios
+
+El archivo `paginas/registro.php` permite crear nuevas cuentas.
+
+Durante el registro:
+
+- Se solicitan nombre, correo electrónico y contraseña.
+- Se validan los campos obligatorios y el formato del correo.
+- Se comprueba que el correo no esté registrado previamente.
+- Se verifica que la contraseña cumpla con la longitud mínima establecida.
+- Se almacena la contraseña mediante `password_hash()` utilizando `PASSWORD_BCRYPT`.
+- Se asigna automáticamente el rol `cliente` a los usuarios registrados públicamente.
+
+Las consultas se realizan mediante sentencias preparadas de PDO.
+
+### Inicio de sesión
+
+El archivo `paginas/login.php` permite autenticar a los usuarios registrados.
+
+El proceso:
+
+1. Recibe el correo electrónico y la contraseña.
+2. Busca al usuario en la base de datos mediante una consulta preparada.
+3. Comprueba que la cuenta esté activa.
+4. Verifica la contraseña con `password_verify()`.
+5. Regenera el identificador de sesión mediante `session_regenerate_id(true)`.
+6. Almacena en `$_SESSION` el identificador, nombre y rol del usuario.
+7. Redirige al perfil cuando la autenticación es correcta.
+
+Los mensajes de error no exponen información técnica ni datos sensibles de la base de datos.
+
+### Manejo seguro de sesiones
+
+La configuración se encuentra en `config/sesion.php`, mediante la función `iniciar_sesion_segura()`.
+
+Se establecen las siguientes medidas:
+
+- Modo estricto de sesiones mediante `session.use_strict_mode`.
+- Cookies de sesión con `HttpOnly`.
+- Atributo `SameSite=Lax`.
+- Atributo `Secure` cuando la conexión utiliza HTTPS.
+- Duración de la cookie limitada a la sesión del navegador.
+- Regeneración del identificador después del inicio de sesión.
+
+### Protección de páginas
+
+El archivo `config/auth_guard.php` centraliza las funciones de control de acceso:
+
+- `requiere_login()`: comprueba que exista una sesión autenticada. Si no existe, redirige al formulario de inicio de sesión.
+- `requiere_administrador()`: comprueba que el usuario esté autenticado y que tenga el rol `administrador`. Si no cuenta con los permisos necesarios, devuelve un código HTTP 403.
+
+Estas funciones se utilizan al comienzo de las páginas que requieren protección, antes de generar contenido HTML.
+
+### Roles de usuario
+
+El sistema utiliza los roles almacenados en la tabla `roles`:
+
+- `cliente`: puede acceder a las secciones protegidas para usuarios autenticados.
+- `administrador`: puede acceder al perfil y al panel de administración.
+
+Las páginas administrativas verifican los permisos del usuario desde el servidor. Ocultar los enlaces del menú no reemplaza esta comprobación.
+
+### Cierre de sesión
+
+El archivo `paginas/logout.php` permite cerrar la sesión mediante:
+
+- Limpieza de los datos almacenados en `$_SESSION`.
+- Eliminación de la cookie de sesión.
+- Destrucción de la sesión mediante `session_destroy()`.
+
+Después del cierre de sesión, las páginas protegidas vuelven a requerir autenticación.
+
 ## Medidas de seguridad
 
 Se aplican distintas medidas para proteger los datos y las operaciones de la aplicación:
@@ -205,6 +290,11 @@ Se aplican distintas medidas para proteger los datos y las operaciones de la apl
 - Protección del acceso directo al archivo `.env` mediante la configuración del servidor.
 - Eliminación de productos mediante solicitudes POST y confirmación previa.
 - Restricciones de claves foráneas para conservar la integridad de los datos relacionados con pedidos.
+- Almacenamiento de contraseñas mediante `password_hash()`.
+- Verificación de contraseñas mediante `password_verify()`.
+- Regeneración del identificador de sesión después de autenticar al usuario.
+- Protección de las cookies de sesión mediante los atributos `HttpOnly`, `SameSite` y `Secure` cuando corresponde.
+- Control de acceso a páginas privadas según el estado de autenticación y el rol del usuario.
 
 ## Vistas y funcionalidades
 
@@ -216,11 +306,13 @@ El sitio contiene distintas secciones:
 4. Métodos de pago.
 5. Contacto y soporte, con formulario validado.
 6. Mi carrito, con cantidades, código de descuento y resumen.
-7. Mi perfil.
-8. Historial de compras.
-9. Mis favoritos, almacenados en el navegador.
-10. Menú hamburguesa y navegación global.
-11. Detalle de juego, con identificación del usuario y selección de paquetes.
+7. Registro e inicio de sesión.
+8. Mi perfil.
+9. Historial de compras.
+10. Mis favoritos, almacenados en el navegador.
+11. Menú hamburguesa y navegación global.
+12. Detalle de juego, con identificación del usuario y selección de paquetes.
+13. Panel administrativo para gestionar productos.
 
 Las interacciones de carrito, favoritos y algunas funciones de perfil son demostrativas y utilizan almacenamiento local del navegador. No se encuentran implementados los pagos ni los envíos reales de recargas.
 
