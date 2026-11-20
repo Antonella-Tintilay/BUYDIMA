@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../config/auth_guard.php';
+requiere_administrador();
 
 require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/../config/conexion.php';

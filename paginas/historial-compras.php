@@ -1,5 +1,6 @@
 <?php
-
+require_once __DIR__ . '/../config/auth_guard.php';
+requiere_login();
 require_once __DIR__ . '/../config/env.php';
 
 $titulo_pagina = 'Historial de compras | ' . APP_NAME;
