@@ -44,14 +44,35 @@ require_once __DIR__ . '/../includes/nav.php';
             <?php echo escapar($error_conexion); ?>
           </div>
         <?php else : ?>
-          <section class="mt-4" aria-labelledby="titulo-listado">
+          
+        <section class="mt-4" aria-labelledby="titulo-listado">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-              <h2 class="h4 mb-0" id="titulo-listado">Listado de productos</h2>
-              <p class="texto-suave mb-0"><?php echo count($productos); ?> productos</p>
+                <h2 class="h4 mb-0" id="titulo-listado">Listado de productos</h2>
+                <p class="texto-suave mb-0" id="cantidad-productos">
+                    <?php echo count($productos); ?> productos
+                </p>
             </div>
 
-            <?php require __DIR__ . '/../includes/tabla-productos.php'; ?>
-          </section>
+            <div class="mb-4">
+                <label for="buscador-productos" class="form-label">
+                    Buscar productos
+                </label>
+                <input
+                    type="search"
+                    class="form-control"
+                    id="buscador-productos"
+                    placeholder="Buscá por nombre de producto o juego..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <div id="resultados-productos" aria-live="polite">
+                <?php require __DIR__ . '/../includes/tabla-productos.php'; ?>
+            </div>
+
+            <p id="mensaje-busqueda" class="texto-suave mt-3" role="status"></p>
+        </section>
+
         <?php endif; ?>
       </div>
 </main>
