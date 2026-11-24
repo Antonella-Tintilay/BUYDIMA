@@ -53,6 +53,7 @@ BUYDIMA/
 ├── mockups/
 ├── capturas/
 ├── clase5/
+├── docs/
 ├── tp6/
 ├── laravel/
 │   ├── app/
@@ -455,6 +456,76 @@ El sitio contiene distintas secciones:
 14. Reporte de productos desarrollado con Laravel.
 
 Las interacciones de carrito, favoritos y algunas funciones de perfil son demostrativas y utilizan almacenamiento local del navegador. No se encuentran implementados los pagos ni los envíos reales de recargas.
+
+## Capturas
+
+### Sitio en funcionamiento
+
+![Sitio de BUYDIMA funcionando en http://localhost/BUYDIMA/](capturas/01-sitio-localhost.png)
+
+### Includes: header, nav y footer
+
+**`includes/header.php`**
+
+![Código de includes/header.php: parte superior](capturas/02a-header-superior.png)
+
+![Código de includes/header.php: parte inferior](capturas/02b-header-inferior.png)
+
+**`includes/nav.php`**
+
+![Código de includes/nav.php: array con los ítems del menú](capturas/02c-nav.png)
+
+![Código de includes/nav.php: navbar con el logo y el buscador](capturas/02d-nav.png)
+
+![Código de includes/nav.php: menú hamburguesa y detección de la página activa](capturas/02e-nav.png)
+
+**`includes/footer.php`**
+
+![Código de includes/footer.php: parte superior, con el logo y las redes sociales](capturas/02f-footer-superior.png)
+
+![Código de includes/footer.php: parte inferior, con las columnas de información y ayuda](capturas/02g-footer-inferior.png)
+
+### Título dinámico y navegación activa
+
+![Título dinámico definido en index.php](capturas/03a-titulo-dinamico.png)
+
+![Menú con la sección activa en juegos.php](capturas/03b-menu-activo.png)
+
+### Variables de entorno
+
+![Contenido del archivo .env.example](capturas/04-env-example.png)
+
+### Formularios y búsqueda
+
+**1. Formulario de contacto vacío**
+
+![Formulario de contacto vacío](clase5/capturas/01-contacto-vacio.png)
+
+**2. Error de correo inválido**
+
+![Error de correo inválido](clase5/capturas/02-correo-invalido.png)
+
+**3. Consulta enviada correctamente**
+
+![Consulta enviada correctamente](clase5/capturas/03-contacto-correcto.png)
+
+**4. Búsqueda mediante GET**
+
+![Búsqueda mediante GET](clase5/capturas/04-busqueda-get.png)
+
+**5. Filtro por categoría**
+
+![Filtro por categoría](clase5/capturas/05-filtro-categoria.png)
+
+**6. Mensaje sin resultados**
+
+![Mensaje sin resultados](clase5/capturas/06-sin-resultados.png)
+
+## Sitio web publicado en GitHub Pages
+
+La versión estática del sitio se conserva en la carpeta `docs/`, con su propio `css/`, `js/`, `img/` y las páginas HTML. El archivo `index.html` de la raíz redirige a esa carpeta para que GitHub Pages muestre el sitio web en lugar de la documentación.
+
+Para publicarlo, en el repositorio de GitHub hay que abrir **Settings → Pages** y elegir la rama `main` con la carpeta `/docs` como origen. La aplicación PHP se sigue ejecutando por separado en un servidor con PHP y MySQL.
 
 ## Documentación
 
